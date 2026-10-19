@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11919.86 stable
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScoutLibrary", "ScoutLibrary\ScoutLibrary.csproj", "{0F696F2D-45B6-4B1A-8BF6-5F85B7C2909D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScoutWeb", "ScoutWeb\ScoutWeb.csproj", "{9FE27F08-B0EB-4D76-8DFE-63049F5D6B1F}"
@@ -18,5 +21,11 @@ Global
 		{9FE27F08-B0EB-4D76-8DFE-63049F5D6B1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FE27F08-B0EB-4D76-8DFE-63049F5D6B1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FE27F08-B0EB-4D76-8DFE-63049F5D6B1F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAA30EC0-2160-4E60-A83D-A0BABE943CCB}
 	EndGlobalSection
 EndGlobal
