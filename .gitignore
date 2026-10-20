@@ -23,10 +23,6 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-*.csproj.user
-*.vs/
-.vs/
-
 # .NET Core
 project.lock.json
 project.fragment.lock.json
@@ -48,6 +44,10 @@ ScaffoldingReadMe.txt
 ~$*
 *~
 CodeCoverage/
+*.csproj.user
+*.vs/
+.vs/
+.idea/
 
 # MSBuild Binary and Structured Log
 *.binlog
