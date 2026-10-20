@@ -5,11 +5,18 @@ using System.Text;
 
 namespace ScoutLibrary.Repositories
 {
-   
+    
     public class ActivityRepository : ICRUD<Activity>
     {
+        private readonly DBWorker _db;
+        public ActivityRepository(DBWorker db)
+        {
+            _db = db;
+        }
+
         public Activity Create(Activity item)
         {
+            
             throw new NotImplementedException();
         }
 
