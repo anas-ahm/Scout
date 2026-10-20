@@ -2,7 +2,7 @@ CREATE TABLE activities (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(255)  NOT NULL,
     start_time  DATETIME      NOT NULL,
-    description VARCHAR(2500) NULL,      
+    description VARCHAR(2500) NULL,
     max_count   INT UNSIGNED  NULL, -- if NULL, there's no limit on members
     min_age     INT UNSIGNED  NULL  -- if NULL, there's no age limit
 );
@@ -12,10 +12,10 @@ CREATE TABLE members (
     first_name    VARCHAR(255) NOT NULL,
     last_name     VARCHAR(255) NOT NULL,
     date_of_birth DATE         NOT NULL,
-    phone_number  CHAR(8)      NOT NULL CHECK (LEN(phone_number) = 8),  
+    phone_number  CHAR(8)      NOT NULL CHECK (CHAR_LENGTH(phone_number) = 8),
     is_leader     BOOLEAN      NOT NULL DEFAULT FALSE,
     username      VARCHAR(255) NOT NULL UNIQUE,
-    password      VARCHAR(255) NOT NULL   
+    password      VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE badges (
@@ -39,5 +39,5 @@ CREATE TABLE member_badges (
 CREATE TABLE activity_required_badges (
     activity_id INT NOT NULL REFERENCES activities(activity_id) ON DELETE CASCADE,
     badge_id    INT NOT NULL REFERENCES badges(badge_id)        ON DELETE CASCADE,
-    PRIMARY KEY (activity_id, badge_id) 
+    PRIMARY KEY (activity_id, badge_id)
 );
