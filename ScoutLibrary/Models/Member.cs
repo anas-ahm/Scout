@@ -29,5 +29,19 @@
 
         // Empty Constructor
         public Member() { }
+
+        public int GetAge()
+        {
+            DateTime today = DateTime.Today;
+            int age = today.Year - DateOfBirth.Year;
+
+            // Subtract one year if the member's birthday hasn't occurred this year yet
+            if (DateOfBirth.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            return age;
+        }
     }
 }
