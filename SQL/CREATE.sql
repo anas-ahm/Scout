@@ -1,46 +1,44 @@
 CREATE TABLE Activity (
-    ActivityID     INT      IDENTITY(1,1)     PRIMARY KEY,
-    Name     VARCHAR(155)     NOT NULL,
-    StartTime     DATETIME      NOT NULL,
-    Description     VARCHAR(2500) NULL,      
-    MaxCount     INT     NULL,      -- if NULL, there's no limit on members
-    MinAge     INT     NULL       -- if NULL, there's no age limit
+    activity_id     INT      AUTO_INCREMENT     PRIMARY KEY,
+    name     VARCHAR(255)     NOT NULL,
+    start_time     DATETIME      NOT NULL,
+    description     VARCHAR(2500) NULL,      
+    max_count     INT UNSIGNED    NULL,      -- if NULL, there's no limit on members
+    min_age     INT UNSIGNED     NULL       -- if NULL, there's no age limit
 );
 
 CREATE TABLE Member (
-    MemberID    INT IDENTITY(1,1) PRIMARY KEY,
-    FirstName   VARCHAR(155) NOT NULL,
-    LastName    VARCHAR(155) NOT NULL,
-    Age         INT          NOT NULL,
-    PhoneNumber VARCHAR(155) NOT NULL
-    CHECK (LEN(PhoneNumber) = 8),  
-    IsLeader    BOOL         NOT NULL DEFAULT FALSE,
-    Username    VARCHAR(155) NOT NULL UNIQUE,
-    Password    VARCHAR(155) NOT NULL   
+    member_id    AUTO_INCREMENT PRIMARY KEY,
+    first_name   VARCHAR(255) NOT NULL,
+    last_name    VARCHAR(255) NOT NULL,
+    date_of_birth DATE         NOT NULL,
+    phone_number CHAR(8) NOT NULL
+    CHECK (LEN(phone_number) = 8),  
+    is_leader    BOOL         NOT NULL DEFAULT FALSE,
+    username    VARCHAR(255) NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL   
 );
 
 CREATE TABLE Badge (
-    BadgeID     INT IDENTITY(1,1) PRIMARY KEY,
-    Name        VARCHAR(155) NOT NULL UNIQUE,
-    Description VARCHAR(2500) NULL
+    badge_id     AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL UNIQUE,
+    description VARCHAR(2500) NULL
 );
 
 CREATE TABLE ActivityMember (
-    ActivityMemberID INT IDENTITY(1,1) PRIMARY KEY,
-    ActivityID       INT NOT NULL REFERENCES Activity(ActivityID) ON DELETE CASCADE,
-    MemberID         INT NOT NULL REFERENCES Member(MemberID)     ON DELETE CASCADE,
-    UNIQUE (ActivityID, MemberID) 
+    activity_id       INT NOT NULL REFERENCES Activity(activity_id) ON DELETE CASCADE,
+    member_id         INT NOT NULL REFERENCES Member(member_id)     ON DELETE CASCADE,
+    PRIMARY KEY (ActivityID, MemberID)
 );
 
 CREATE TABLE MemberBadge (
-    MemberBadgeID INT IDENTITY(1,1) PRIMARY KEY,
-    MemberID      INT NOT NULL REFERENCES Member(MemberID) ON DELETE CASCADE,
-    BadgeID       INT NOT NULL REFERENCES Badge(BadgeID)   ON DELETE CASCADE,
-    UNIQUE (MemberID, BadgeID)
+    member_id      INT NOT NULL REFERENCES Member(member_id) ON DELETE CASCADE,
+    badge_id       INT NOT NULL REFERENCES Badge(badge_id)   ON DELETE CASCADE,
+    PRIMARY KEY (member_id, badge_id)
 );
 
 CREATE TABLE ActivityRequiredBadges (
-    ActivityID INT NOT NULL REFERENCES Activity(ActivityID) ON DELETE CASCADE,
-    BadgeID    INT NOT NULL REFERENCES Badge(BadgeID)       ON DELETE CASCADE,
-    PRIMARY KEY (ActivityID, BadgeID) 
+    activity_id INT NOT NULL REFERENCES Activity(activity_id) ON DELETE CASCADE,
+    badge_id    INT NOT NULL REFERENCES Badge(badge_id)       ON DELETE CASCADE,
+    PRIMARY KEY (activity_id, badge_id) 
 );
