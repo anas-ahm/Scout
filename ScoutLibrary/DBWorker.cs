@@ -1,6 +1,5 @@
 ﻿using DotNetEnv;
-using MySql.Data.MySqlClient;
-using Microsoft.Data.SqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +11,7 @@ namespace ScoutLibrary
         /// <summary>
         /// The SQL connection used to interact with the database.
         /// </summary>
-        private SqlConnection _connection = null!;
+        private MySqlConnection _connection = null!;
 
         /// <summary>
         /// The connection string used to connect to the database.
@@ -22,7 +21,7 @@ namespace ScoutLibrary
         /// <summary>
         /// Initializes a new instance of the <see cref="DBWorker"/> class with the specified connection string.
         /// </summary>
-        public SqlConnection Connection => _connection;
+        public MySqlConnection Connection => _connection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DBWorker"/> class and loads the connection string from the `DB_CONNECTION_STRING` environment variable.
@@ -39,9 +38,9 @@ namespace ScoutLibrary
         /// Connects to the database using the connection string and returns the established SQL connection.
         /// </summary>
         /// <returns>The established SQL connection.</returns>
-        public SqlConnection Connect()
+        public MySqlConnection Connect()
         {
-            _connection = new SqlConnection(_connectionString);
+            _connection = new MySqlConnection(_connectionString);
             _connection.Open();
             return _connection;
         }
