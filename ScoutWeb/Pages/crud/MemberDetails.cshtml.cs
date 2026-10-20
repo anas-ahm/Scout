@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ScoutWeb.Pages.crud;
 
-public class MemberDetails : PageModel
+public class MemberDetailsModel : PageModel
 {
     public void OnGet()
     {
