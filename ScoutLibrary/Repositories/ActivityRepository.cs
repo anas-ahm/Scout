@@ -21,12 +21,12 @@ namespace ScoutLibrary.Repositories
             throw new NotImplementedException();
         }
 
-        public Activity GetById(string id)
+        public Activity GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Activity Update(Activity newItem, string id)
+        public Activity Update(Activity newItem, int id)
         {
             throw new NotImplementedException();
         }
