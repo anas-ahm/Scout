@@ -1,4 +1,51 @@
 ﻿@page
 @model ScoutWeb.Pages.crud.CreateActivityModel
 @{
+    ViewData["Title"] = "Opret aktivitet";
 }
+
+<h1>Opret ny aktivitet</h1>
+
+<form method="post">
+    <!-- Viser generelle fejl fra ModelState -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Navn -->
+    <div>
+        <label asp-for="Name"></label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <!-- Dato og Tid -->
+    <div>
+        <label asp-for="DateTime"></label>
+        <input asp-for="DateTime" />
+        <span asp-validation-for="DateTime" class="text-danger"></span>
+    </div>
+
+    <!-- Beskrivelse (Brug evt. textarea til længere tekst) -->
+    <div>
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Max antal deltagere -->
+    <div>
+        <label asp-for="MaxCount"></label>
+        <input asp-for="MaxCount" />
+        <span asp-validation-for="MaxCount" class="text-danger"></span>
+    </div>
+
+    <!-- Minimum alder -->
+    <div>
+        <label asp-for="MinAge"></label>
+        <input asp-for="MinAge" />
+        <span asp-validation-for="MinAge" class="text-danger"></span>
+    </div>
+
+    <!-- Submit knap -->
+    <button type="submit">Opret aktivitet</button>
+</form>
+
