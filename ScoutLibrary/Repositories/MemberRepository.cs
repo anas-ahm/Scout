@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ScoutLibrary.Repositories
 {
-    internal class MemberRepository
+    public class MemberRepository
     {
         private MySqlConnection ConnectToDB()
         {

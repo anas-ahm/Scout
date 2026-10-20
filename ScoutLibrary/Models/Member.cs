@@ -1,6 +1,6 @@
 ﻿namespace ScoutLibrary.Models
 {
-    internal class Member
+    public class Member
     {
         public int MemberId { get; set; }
         public string FirstName { get; set; }

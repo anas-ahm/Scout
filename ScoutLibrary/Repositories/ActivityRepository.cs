@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace ScoutLibrary.Repositories
 {
+   
     public class ActivityRepository : ICRUD<Activity>
     {
         public Activity Create(Activity item)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ScoutLibrary.Models
 {
-    internal class Badge
+    public class Badge
     {
         public int BadgeId { get; set; }
         public string Name { get; set; }
