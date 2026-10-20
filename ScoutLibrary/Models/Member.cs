@@ -85,7 +85,7 @@ namespace ScoutLibrary.Models
                 {
                     throw new ArgumentException("Username can't be empty");
                 }
-                _username = value.Trim();
+                _username = value;
             }
         }
 
