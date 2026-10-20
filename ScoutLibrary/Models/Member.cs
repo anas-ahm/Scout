@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ScoutLibrary.Models
 {
-    internal class Member
+    public class Member
     {
         // Instance fields
         private string _firstName;
