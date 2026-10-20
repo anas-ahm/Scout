@@ -4,7 +4,12 @@ using System.Text;
 
 namespace ScoutLibrary.Repositories
 {
-    internal interface ICRUD
+    public interface ICRUD<T>
     {
+        public T Create(T item);
+        public T Delete(int id);
+        public T Update(T newItem, string id);
+        public T GetById(string id);
+        public List<T> GetAll();
     }
 }
