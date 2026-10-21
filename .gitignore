@@ -48,6 +48,7 @@ CodeCoverage/
 *.vs/
 .vs/
 .idea/
+.vscode/
 
 # MSBuild Binary and Structured Log
 *.binlog
