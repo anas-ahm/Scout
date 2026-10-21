@@ -9,7 +9,7 @@ namespace ScoutWeb.Pages.crud
     public class CreateActivityModel : PageModel
     {
         private readonly ICRUD<Activity> _activityRepository;
-        //private readonly ICRUD<Badge> _badgeRepository 
+        private readonly ICRUD<Badge> _badgeRepository;
 
         [BindProperty]
         public string Name { get; set; }
@@ -28,17 +28,15 @@ namespace ScoutWeb.Pages.crud
         public List<Badge> AvailableBadges { get; set; } = new List<Badge>();
 
 
-        public CreateActivityModel(ICRUD<Activity> activityRepository)
+        public CreateActivityModel(ICRUD<Activity> activityRepository, ICRUD<Badge> badgeRepository)
         {
-            _activityRepository = activityRepository; 
-            //_badgeRepository = badgeRepository;
-            //indsæt badgeRepository her
+            _activityRepository = activityRepository;
+            _badgeRepository = badgeRepository;            
         }
 
         public void OnGet()
         {
-            AvailableBadges = new List<Badge>();
-            //AvailableBadges = _badgeRepository.GetAll();
+            AvailableBadges = _badgeRepository.GetAll();
         }
 
 

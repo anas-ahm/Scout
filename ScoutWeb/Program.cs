@@ -10,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<ScoutLibrary.DBWorker>();
 builder.Services.AddScoped<ICRUD<Activity>, ActivityRepository>();
 builder.Services.AddScoped<ICRUD<Member>, MemberRepository>();
+builder.Services.AddScoped<ICRUD<Badge>, BadgeRepository>();
 builder.Services.AddScoped<ScoutService>();
 
 
