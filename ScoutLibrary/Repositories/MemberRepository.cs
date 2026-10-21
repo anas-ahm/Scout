@@ -56,7 +56,32 @@ namespace ScoutLibrary.Repositories
         
         public Member Delete(int id)
         {
-            throw new NotImplementedException();
+            int rowsDeleted;
+            
+            try
+            {
+                string sql = "DELETE FROM members WHERE member_id = @id";
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+
+                cmd.Parameters.AddWithValue("id", id);
+                rowsDeleted = cmd.ExecuteNonQuery();
+
+            }
+            
+            catch (Exception ex)
+            {
+                throw new Exception("Fejl opstået", ex);
+            }
+            
+            if (rowsDeleted == 0)
+            {
+                throw new KeyNotFoundException("Medlemmet blev ikke fundet.");
+            }
+            
+            return new Member { MemberId = id };
         }
 
         public Member Update(Member member, int id)
@@ -71,7 +96,38 @@ namespace ScoutLibrary.Repositories
 
         public List<Member> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = """ SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members ORDER BY first_name""";
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+
+                using MySqlDataReader reader = cmd.ExecuteReader();
+
+                List<Member> memberList = new List<Member>();
+                while (reader.Read())
+                {
+                    Member memberToAdd = new Member();
+                    memberToAdd.MemberId = reader.GetInt32("member_id");
+                    memberToAdd.FirstName = reader.GetString("first_name");
+                    memberToAdd.LastName = reader.GetString("last_name");
+                    memberToAdd.DateOfBirth = reader.GetDateTime("date_of_birth");
+                    memberToAdd.PhoneNumber = reader.GetString("phone_number");
+                    memberToAdd.IsLeader = reader.GetBoolean("is_leader");
+                    memberToAdd.Username = reader.GetString("username");
+                
+                    memberList.Add(memberToAdd);
+                }
+
+                return memberList;   
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Der opstod en fejl ved hentningen af spejdere ", ex);
+            }
+            
         }
     }
 }
