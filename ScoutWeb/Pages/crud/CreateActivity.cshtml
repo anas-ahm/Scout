@@ -72,8 +72,12 @@
                         <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
                     }
                 </select>
-        </div>     
-    }
+            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+            <!-- Denne linje udskriver fejlen, hvis ingen er valgt -->
+            <span asp-validation-for="SelectedLeaders" class="text-danger"></span>
+        </div>
+    }   
+
     <!-- Submit knap -->
     <button type="submit">Opret aktivitet</button>
 </form>

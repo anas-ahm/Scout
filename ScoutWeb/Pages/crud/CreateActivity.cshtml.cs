@@ -25,9 +25,9 @@ namespace ScoutWeb.Pages.crud
         [BindProperty]
         public int? MinAge { get; set; }
         [BindProperty]
-        public List<int>? SelectedBadges { get; set; }
+        public List<int>? SelectedBadges { get; set; } = new List<int>();
         [BindProperty]
-        public List<int>? SelectedLeaders { get; set; } //skal ikke tillade null når getall er lavet.
+        public List<int> SelectedLeaders { get; set; } = new List<int>();
 
         // Denne liste bruges til at vise alle eksisterende badges og ledere i HTML-formularen
         public List<Badge>? AvailableBadges { get; set; } = new List<Badge>();
@@ -50,12 +50,17 @@ namespace ScoutWeb.Pages.crud
 
         public IActionResult OnPost()
         {
+            //betingelser gemmes INDEN man checker modelstate, for at blive kontrolleret og vist
+            if (SelectedLeaders == null || SelectedLeaders.Count == 0)
+            {
+                ModelState.AddModelError("SelectedLeaders", "Du skal vælge mindst én leder til aktiviteten.");
+            }
+
             if (!ModelState.IsValid)
             {
                 OnGet();
                 return Page();
             }
-
             //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
             var allBadges = _badgeService.GetAll();
             var allLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();

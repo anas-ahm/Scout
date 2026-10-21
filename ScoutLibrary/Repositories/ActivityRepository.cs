@@ -198,9 +198,6 @@ namespace ScoutLibrary.Repositories
                     }
 
                 }
-                List<Activity> activities = activityDictionary.Values.ToList();
-
-
             }
             return activityDictionary.Values.ToList();
         }
