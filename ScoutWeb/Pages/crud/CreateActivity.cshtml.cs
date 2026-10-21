@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScoutLibrary.Repositories;
 using ScoutLibrary.Models;
 using Activity = ScoutLibrary.Models.Activity;
+using ScoutLibrary.Service;
+using System.ComponentModel.Design.Serialization;
 
 namespace ScoutWeb.Pages.crud
 {
     public class CreateActivityModel : PageModel
     {
-        private readonly ICRUD<Activity> _activityRepository;
-        private readonly ICRUD<Badge> _badgeRepository;
+        private readonly ActivityService _activityService;
+        private readonly BadgeService _badgeService;
+        private readonly ScoutService _memberService;
 
         [BindProperty]
         public string Name { get; set; }
@@ -22,21 +25,26 @@ namespace ScoutWeb.Pages.crud
         [BindProperty]
         public int? MinAge { get; set; }
         [BindProperty]
-        public List<Badge>? RequiredBadges { get; set; }
+        public List<int>? SelectedBadges { get; set; }
+        [BindProperty]
+        public List<int>? SelectedLeaders { get; set; } //skal ikke tillade null når getall er lavet.
 
-        // Denne liste bruges til at vise alle tilgængelige badges i HTML-formularen
-        public List<Badge> AvailableBadges { get; set; } = new List<Badge>();
+        // Denne liste bruges til at vise alle eksisterende badges og ledere i HTML-formularen
+        public List<Badge>? AvailableBadges { get; set; } = new List<Badge>();
+        public List<Member>? AvailableLeaders { get; set; } = new List<Member>();
 
 
-        public CreateActivityModel(ICRUD<Activity> activityRepository, ICRUD<Badge> badgeRepository)
+        public CreateActivityModel(ActivityService activityService, BadgeService badgeService, ScoutService memberService)
         {
-            _activityRepository = activityRepository;
-            _badgeRepository = badgeRepository;            
+            _activityService = activityService;
+            _badgeService = badgeService;
+            _memberService = memberService;
         }
 
         public void OnGet()
         {
-            AvailableBadges = _badgeRepository.GetAll();
+            AvailableBadges = _badgeService.GetAll();
+            //AvailableLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
         }
 
 
@@ -48,20 +56,34 @@ namespace ScoutWeb.Pages.crud
                 return Page();
             }
 
-            Activity activity = new Activity 
-            { 
-                Name = Name, 
-                DateTime = DateTime, 
-                Description = Description, 
-                MaxCount = MaxCount, 
-                MinAge = MinAge, 
-                RequiredBadges = RequiredBadges, 
-                Members = null                          //kan evt automatisk tilføje den leder, der oprettede aktiviteten
+            //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
+            var allBadges = _badgeService.GetAll();
+            var allLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
+
+            //Listen af valgte id'er bundet via BindModel skal laves om til en liste af objekterne:
+            var requiredBadges = allBadges
+                                .Where(b => SelectedBadges?.Contains(b.BadgeId) == true)
+                                .ToList();
+
+            //var members = allLeaders
+            //            .Where(l => SelectedLeaders?.Contains(l.MemberId) == true)
+            //            .ToList();
+            
+
+            Activity activity = new Activity
+            {
+                Name = Name,
+                DateTime = DateTime,
+                Description = Description,
+                MaxCount = MaxCount,
+                MinAge = MinAge,
+                RequiredBadges = requiredBadges,
+                Members = null
             };
 
             try
             {
-                _activityRepository.Create(activity);
+                _activityService.Create(activity);
                 TempData["SuccessMessage"] = "Aktivitet oprettet succesfuldt!";
                 return RedirectToPage("/Index");
             }

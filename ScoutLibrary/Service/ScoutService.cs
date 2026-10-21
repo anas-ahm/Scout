@@ -16,4 +16,9 @@ public class ScoutService
         return _memberRepo.Create(member);
     }
 
+    public List<Member> GetAll()
+    {
+        throw new NotImplementedException();
+    }
+
 }

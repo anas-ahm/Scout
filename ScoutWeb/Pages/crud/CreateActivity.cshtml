@@ -46,12 +46,35 @@
         <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
 
-    @foreach (Badge badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
+    <!-- 1. Vælg mærker (Looper igennem AvailableBadges, gemmer i RequiredBadges) -->
+    @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
     {
-        <div>
-            <input type="checkbox" id="badge_@badge.BadgeId" name="RequiredBadges" value="@badge.BadgeId" />
-            <label for="badge_@badge.BadgeId">@badge.Name</label>
-        </div>
+        @foreach (Badge badge in Model.AvailableBadges)
+        {
+            <div>
+                <input type="checkbox" 
+                        id="badge_@badge.BadgeId" 
+                        name="SelectedBadges" 
+                        value="@badge.BadgeId" />
+                <label for="badge_@badge.BadgeId">@badge.Name</label>
+            </div>
+        }
+    }
+
+    <!-- 2. Vælg ledere (Looper igennem AvailableLeaders, gemmer i Members) -->
+    @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
+    {
+        @foreach (Member leader in Model.AvailableLeaders)
+        {
+            <div>
+              
+                <input type="checkbox" 
+                    id="leader_@leader.MemberId" 
+                    name="SelectedMembers" 
+                    value="@leader.MemberId" />                
+                <label for="leader_@leader.MemberId">@leader.FirstName</label>
+            </div>
+        }
     }
     <!-- Submit knap -->
     <button type="submit">Opret aktivitet</button>
