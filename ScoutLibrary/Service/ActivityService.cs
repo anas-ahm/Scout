@@ -19,5 +19,10 @@ namespace ScoutLibrary.Service
         {
             return _activityRepository.Create(item);            
         }
+
+        public List<Activity> GetAll()
+        {
+            return _activityRepository.GetAll();
+        }
     }
 }

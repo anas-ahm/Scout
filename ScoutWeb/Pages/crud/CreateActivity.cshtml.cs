@@ -44,7 +44,7 @@ namespace ScoutWeb.Pages.crud
         public void OnGet()
         {
             AvailableBadges = _badgeService.GetAll();
-            //AvailableLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
+            AvailableLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();
         }
 
 
@@ -58,17 +58,17 @@ namespace ScoutWeb.Pages.crud
 
             //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
             var allBadges = _badgeService.GetAll();
-            //var allLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
+            var allLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();
 
-            //Listen af valgte id'er bundet via BindModel skal laves om til en liste af objekterne:
+            //Listen af valgte id'er som er bundet via BindModel bruges til at lave en liste af objekterne:
             var requiredBadges = allBadges
                                 .Where(b => SelectedBadges?.Contains(b.BadgeId) == true)
                                 .ToList();
 
-            //var members = allLeaders
-            //            .Where(l => SelectedLeaders?.Contains(l.MemberId) == true)
-            //            .ToList();
-            
+            var members = allLeaders
+                        .Where(l => SelectedLeaders?.Contains(l.MemberId) == true)
+                        .ToList();
+
 
             Activity activity = new Activity
             {
@@ -78,7 +78,7 @@ namespace ScoutWeb.Pages.crud
                 MaxCount = MaxCount,
                 MinAge = MinAge,
                 RequiredBadges = requiredBadges,
-                Members = null
+                Members = members
             };
 
             try

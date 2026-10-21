@@ -49,32 +49,30 @@
     <!-- 1. Vælg mærker (Looper igennem AvailableBadges, gemmer i RequiredBadges) -->
     @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
     {
-        @foreach (Badge badge in Model.AvailableBadges)
-        {
-            <div>
-                <input type="checkbox" 
-                        id="badge_@badge.BadgeId" 
-                        name="SelectedBadges" 
-                        value="@badge.BadgeId" />
-                <label for="badge_@badge.BadgeId">@badge.Name</label>
-            </div>
-        }
+        <div>
+            <label for="SelectedBadges">Vælg tegn:</label>
+            <select name="SelectedBadges" id="SelectedBadges" multiple>
+                @foreach (Badge badge in Model.AvailableBadges)
+                {
+                    <option value="@badge.BadgeId">@badge.Name</option>
+                }
+            </select>
+            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+        </div>
     }
 
     <!-- 2. Vælg ledere (Looper igennem AvailableLeaders, gemmer i Members) -->
     @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
     {
-        @foreach (Member leader in Model.AvailableLeaders)
-        {
-            <div>
-              
-                <input type="checkbox" 
-                    id="leader_@leader.MemberId" 
-                    name="SelectedMembers" 
-                    value="@leader.MemberId" />                
-                <label for="leader_@leader.MemberId">@leader.FirstName</label>
-            </div>
-        }
+        <div>
+            <label for="SelectedLeaders">Vælg leder:  </label>
+            <select name="SelectedLeaders" id="SelectedLeaders" multiple>
+                    @foreach(Member leader in Model.AvailableLeaders)
+                    {
+                        <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
+                    }
+                </select>
+        </div>     
     }
     <!-- Submit knap -->
     <button type="submit">Opret aktivitet</button>
