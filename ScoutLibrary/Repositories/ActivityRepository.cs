@@ -20,7 +20,7 @@ namespace ScoutLibrary.Repositories
 
         public Activity Create(Activity item)
         {
-            using (MySqlConnection connection = _db.Connect())
+            using (MySqlConnection connection = _db.Connect2())
             {
                 using (MySqlTransaction transaction = connection.BeginTransaction())
                 {
@@ -33,10 +33,11 @@ namespace ScoutLibrary.Repositories
                         {
                             cmd.Parameters.AddWithValue("@name", item.Name);
                             cmd.Parameters.AddWithValue("@date_time", item.DateTime);
-                            cmd.Parameters.AddWithValue("@description", item.Description);
-                            cmd.Parameters.AddWithValue("@max_count", item.MaxCount);
-                            cmd.Parameters.AddWithValue("@min_age", item.MinAge);
+                            cmd.Parameters.AddWithValue("@description", (object)item.Description??DBNull.Value);  //property skal castes til object, således datatypen i property er samme type som DBNull, som ska lsendes til databasen hvis en værdi er null
+                            cmd.Parameters.AddWithValue("@max_count", (object)item.MaxCount??DBNull.Value);
+                            cmd.Parameters.AddWithValue("@min_age", (object)item.MinAge??DBNull.Value);
                             cmd.ExecuteNonQuery();
+
 
 
                             // Få det nye ID som databasen netop har genereret (AUTO_INCREMENT)
@@ -47,12 +48,17 @@ namespace ScoutLibrary.Repositories
                         string reqBadgeQuery = "INSERT INTO required_activity_badges (activity_id, badge_id) VALUES (@activity_id, @badge_id)";
                         using (MySqlCommand cmdBadge = new MySqlCommand(reqBadgeQuery, connection, transaction))
                         {
-                            for (int i = 0; i < item.RequiredBadges.Count; i++)
+                            if (item.RequiredBadges != null&&item.RequiredBadges.Count>0)
                             {
-                                cmdBadge.Parameters.AddWithValue("@activity_id", item.ActivityId);
-                                cmdBadge.Parameters.AddWithValue("@badge_id", item.RequiredBadges[i]);
-                                cmdBadge.ExecuteNonQuery();
+                                for (int i = 0; i < item.RequiredBadges.Count; i++)
+                                {
+                                    cmdBadge.Parameters.Clear();
+                                    cmdBadge.Parameters.AddWithValue("@activity_id", item.ActivityId);
+                                    cmdBadge.Parameters.AddWithValue("@badge_id", (object)item.RequiredBadges[i] ?? DBNull.Value);
+                                    cmdBadge.ExecuteNonQuery();
+                                }
                             }
+                            
                         }
                         transaction.Commit();
                         return item;

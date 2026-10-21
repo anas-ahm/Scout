@@ -47,5 +47,14 @@ namespace ScoutLibrary
             return _connection;
         }
 
+ 
+
+        public MySqlConnection Connect2()     // brug denne uden properties - den returnerer en MySqlCOnnection automatisk når metoden kaldes, så den gemmes bare i en variabel
+        {
+            var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            return connection;
+        }
+
     }
 }

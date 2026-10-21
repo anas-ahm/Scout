@@ -40,7 +40,7 @@ namespace ScoutWeb.Pages.crud
                 OnGet();
                 return Page();
             }
-            Activity activity = new Activity { Name = Name, DateTime = DateTime, Description = Description, MaxCount = MaxCount, MinAge = MinAge };
+            Activity activity = new Activity { Name = Name, DateTime = DateTime, Description = Description, MaxCount = MaxCount, MinAge = MinAge, RequiredBadges = null, Members = null };
             try
             {
                 _activityRepository.Create(activity);
