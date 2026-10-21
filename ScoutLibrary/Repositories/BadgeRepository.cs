@@ -92,6 +92,25 @@ public class BadgeRepository : ICRUD<Badge>
 
 	public Badge Update(Badge newItem, int id)
 	{
-		throw new NotImplementedException();
+		const string query = """
+		UPDATE badges SET name = @name, description = @description WHERE badge_id = @id;
+		""";
+
+		using MySqlConnection connection = _db.Connect();
+
+		using MySqlCommand command = new MySqlCommand(query, connection);
+		command.Parameters.AddWithValue("@name", newItem.Name);
+		command.Parameters.AddWithValue("@description", newItem.Description ?? (object)DBNull.Value);
+		command.Parameters.AddWithValue("@id", id);
+
+		int rowsAffected = command.ExecuteNonQuery();
+
+		if (rowsAffected != 1)
+		{
+			throw new KeyNotFoundException($"Badge with ID {id} not found.");
+		}
+
+		newItem.BadgeId = id;
+		return newItem;
 	}
 }
