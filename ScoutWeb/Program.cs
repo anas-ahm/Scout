@@ -2,6 +2,7 @@ using ScoutLibrary.Repositories;
 using Activity = ScoutLibrary.Models.Activity;
 using ScoutLibrary.Models;
 using ScoutLibrary.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,17 @@ builder.Services.AddScoped<ICRUD<Activity>, ActivityRepository>();
 builder.Services.AddScoped<ICRUD<Member>, MemberRepository>();
 builder.Services.AddScoped<ScoutService>();
 
+// Add cookie authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+    {
+        options.Cookie.Name = "session-cookie"; // Set the name of the cookie
+        options.Cookie.HttpOnly = true; // Prevent client side scripts from accessing the cookie
+        // options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require https
+        options.Cookie.SameSite = SameSiteMode.Lax; // Restricts the cookie to same-site requests
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set the expiration time for the cookie
+        options.SlidingExpiration = true; // Increases the expiration time if the user is still active
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -27,6 +39,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
