@@ -58,7 +58,7 @@ namespace ScoutWeb.Pages.crud
 
             //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
             var allBadges = _badgeService.GetAll();
-            var allLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
+            //var allLeaders = _memberService.GetAll().Where(m => m.IsLeader).ToList();
 
             //Listen af valgte id'er bundet via BindModel skal laves om til en liste af objekterne:
             var requiredBadges = allBadges
