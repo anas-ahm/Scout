@@ -15,6 +15,23 @@
 <!-- end -->
 
 
+
+<!-- Pop up confirmation for deletion of member-->
+@if (Model.memberToDelete != 0)
+{
+    <div class="alert alert-warning">
+        <p>Er du sikker på, at du vil slette denne spejder?</p>
+        <form method="post" asp-page-handler="ConfirmMemberDeletion">
+            <input type="hidden" name="id" value="@Model.memberToDelete" />
+            <button type="submit">Ja, slet</button>
+            <a asp-page="/Index">Annuller</a>
+        </form>
+    </div>
+}
+<!-- end -->
+
+
+
 <!-- ErrorMessages after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
@@ -25,10 +42,12 @@
 <!-- end -->
 
 
+
 <div class="text-center">
     <h1 class="display-4">Velkommen til de lysserøde spejdere</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
 
 
 <!-- List over all Scouts-->
@@ -40,14 +59,23 @@
         <span>@member.PhoneNumber</span>
         <span>@member.Username</span>
         <span>@(member.IsLeader ? "Leder" : "Spejder")</span>
-        <span></span>
+        <a >Delete</a>
+        
+        <form method="post" asp-page-handler="AskDeletion">
+            <input type="hidden" name="id" value="@member.MemberId" />
+            <button type="submit">Slet</button>
+        </form>
     </div>
 }
 <!-- end -->
 
+
+
 <!-- Button for create Scout for leaders -->
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
+
+
 
 <!-- Button for create Activity for leaders -->
 <a asp-page="/crud/CreateActivity">Opret Aktivitet</a>

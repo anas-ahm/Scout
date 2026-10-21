@@ -16,4 +16,14 @@ public class ScoutService
         return _memberRepo.Create(member);
     }
 
+    public List<Member> ReadAllMembers()
+    {
+        return _memberRepo.GetAll();
+    }
+
+    public Member DeleteMember(int id)
+    {
+        return _memberRepo.Delete(id);
+    }
+
 }
