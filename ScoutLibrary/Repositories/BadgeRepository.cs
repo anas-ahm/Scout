@@ -33,7 +33,23 @@ public class BadgeRepository : ICRUD<Badge>
 
 	public Badge Delete(int id)
 	{
-		throw new NotImplementedException();
+		const string query = """
+		DELETE FROM badges WHERE badge_id = @id;
+		""";
+
+		using MySqlConnection connection = _db.Connect();
+
+		using MySqlCommand command = new MySqlCommand(query, connection);
+		command.Parameters.AddWithValue("@id", id);
+
+		int rowsAffected = command.ExecuteNonQuery();
+
+		if (rowsAffected != 1)
+		{
+			throw new KeyNotFoundException($"Badge with ID {id} not found.");
+		}
+
+		return new Badge { BadgeId = id };
 	}
 
 	public List<Badge> GetAll()
