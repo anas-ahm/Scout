@@ -66,7 +66,28 @@ public class BadgeRepository : ICRUD<Badge>
 
 	public Badge GetById(int id)
 	{
-		throw new NotImplementedException();
+		const string query = """
+		SELECT badge_id, name, description FROM badges WHERE badge_id = @id;
+		""";
+
+		using MySqlConnection connection = _db.Connect();
+
+		using MySqlCommand command = new MySqlCommand(query, connection);
+		command.Parameters.AddWithValue("@id", id);
+
+		using MySqlDataReader reader = command.ExecuteReader();
+
+		if (!reader.Read())
+		{
+			throw new KeyNotFoundException($"Badge with ID {id} not found.");
+		}
+
+		return new Badge
+		{
+			BadgeId = reader.GetInt32("badge_id"),
+			Name = reader.GetString("name"),
+			Description = reader.GetString("description")
+		};
 	}
 
 	public Badge Update(Badge newItem, int id)
