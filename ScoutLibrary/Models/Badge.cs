@@ -8,10 +8,10 @@ namespace ScoutLibrary.Models
     {
         public int BadgeId { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         
         // Constructor
-        public Badge(int badgeId, string name, string description )
+        public Badge(int badgeId, string name, string? description)
         {
             BadgeId = badgeId;
             Name = name;
