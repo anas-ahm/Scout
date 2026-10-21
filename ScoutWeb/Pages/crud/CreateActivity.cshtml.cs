@@ -9,6 +9,7 @@ namespace ScoutWeb.Pages.crud
     public class CreateActivityModel : PageModel
     {
         private readonly ICRUD<Activity> _activityRepository;
+        //private readonly ICRUD<Badge> _badgeRepository 
 
         [BindProperty]
         public string Name { get; set; }
@@ -21,20 +22,23 @@ namespace ScoutWeb.Pages.crud
         [BindProperty]
         public int? MinAge { get; set; }
         [BindProperty]
-        public List<Badge> RequiredBadges { get; set; }
+        public List<Badge>? RequiredBadges { get; set; }
 
-        // NY: Denne liste bruges til at vise alle tilgængelige mærker i HTML-formularen
-        public List<Badge> AvailableBadges { get; set; } = new();
+        // Denne liste bruges til at vise alle tilgængelige badges i HTML-formularen
+        public List<Badge> AvailableBadges { get; set; } = new List<Badge>();
 
 
         public CreateActivityModel(ICRUD<Activity> activityRepository)
         {
-            _activityRepository = activityRepository;            
+            _activityRepository = activityRepository; 
+            //_badgeRepository = badgeRepository;
+            //indsæt badgeRepository her
         }
 
         public void OnGet()
         {
             AvailableBadges = new List<Badge>();
+            //AvailableBadges = _badgeRepository.GetAll();
         }
 
 
@@ -45,6 +49,7 @@ namespace ScoutWeb.Pages.crud
                 OnGet();
                 return Page();
             }
+
             Activity activity = new Activity 
             { 
                 Name = Name, 
@@ -53,7 +58,7 @@ namespace ScoutWeb.Pages.crud
                 MaxCount = MaxCount, 
                 MinAge = MinAge, 
                 RequiredBadges = RequiredBadges, 
-                Members = null 
+                Members = null                          //kan evt automatisk tilføje den leder, der oprettede aktiviteten
             };
 
             try

@@ -52,7 +52,7 @@ namespace ScoutLibrary.Repositories
                             {
                                 for (int i = 0; i < item.RequiredBadges.Count; i++)
                                 {
-                                    cmdBadge.Parameters.Clear();
+                                    cmdBadge.Parameters.Clear(); //denne linje er nødvendig fordi vi kører en loop og skal indsætte nye værdier for hver iteration
                                     cmdBadge.Parameters.AddWithValue("@activity_id", item.ActivityId);
                                     cmdBadge.Parameters.AddWithValue("@badge_id", (object)item.RequiredBadges[i] ?? DBNull.Value);
                                     cmdBadge.ExecuteNonQuery();

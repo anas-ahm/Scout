@@ -1,7 +1,8 @@
 ﻿@page
 @model ScoutWeb.Pages.crud.CreateActivityModel
+@using ScoutLibrary.Models;
 @{
-    ViewData["Title"] = "Opret aktivitet";
+    ViewData["Title"] = "Opret aktivitet";    
 }
 
 <h1>Opret ny aktivitet</h1>
@@ -45,7 +46,7 @@
         <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
 
-    @foreach (var badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
+    @foreach (Badge badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
     {
         <div>
             <input type="checkbox" id="badge_@badge.BadgeId" name="RequiredBadges" value="@badge.BadgeId" />
