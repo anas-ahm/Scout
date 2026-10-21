@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScoutLibrary.Repositories;
+using ScoutLibrary.Models;
 using Activity = ScoutLibrary.Models.Activity;
 
 namespace ScoutWeb.Pages.crud
@@ -19,10 +20,13 @@ namespace ScoutWeb.Pages.crud
         public int? MaxCount { get; set; }
         [BindProperty]
         public int? MinAge { get; set; }
+        [BindProperty]
+        public List<Badge> RequiredBadges { get; set; }
 
-        
+        // NY: Denne liste bruges til at vise alle tilgængelige mærker i HTML-formularen
+        public List<Badge> AvailableBadges { get; set; } = new();
 
-        
+
         public CreateActivityModel(ICRUD<Activity> activityRepository)
         {
             _activityRepository = activityRepository;            
@@ -30,6 +34,7 @@ namespace ScoutWeb.Pages.crud
 
         public void OnGet()
         {
+            AvailableBadges = new List<Badge>();
         }
 
 
@@ -40,7 +45,17 @@ namespace ScoutWeb.Pages.crud
                 OnGet();
                 return Page();
             }
-            Activity activity = new Activity { Name = Name, DateTime = DateTime, Description = Description, MaxCount = MaxCount, MinAge = MinAge, RequiredBadges = null, Members = null };
+            Activity activity = new Activity 
+            { 
+                Name = Name, 
+                DateTime = DateTime, 
+                Description = Description, 
+                MaxCount = MaxCount, 
+                MinAge = MinAge, 
+                RequiredBadges = RequiredBadges, 
+                Members = null 
+            };
+
             try
             {
                 _activityRepository.Create(activity);
