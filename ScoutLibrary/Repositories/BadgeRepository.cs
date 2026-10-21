@@ -12,9 +12,23 @@ public class BadgeRepository : ICRUD<Badge>
 		_db = db;
 	}
 
-	public Badge Create(Badge item)
+	public Badge Create(Badge badge)
 	{
-		throw new NotImplementedException();
+		const string query = """
+		INSERT INTO badges (name, description) VALUES (@name, @description);
+		SELECT LAST_INSERT_ID();
+		""";
+
+		using MySqlConnection connection = _db.Connect();
+
+		using MySqlCommand command = new MySqlCommand(query, connection);
+		command.Parameters.AddWithValue("@name", badge.Name);
+		command.Parameters.AddWithValue("@description", badge.Description ?? (object)DBNull.Value);
+
+		int newId = Convert.ToInt32(command.ExecuteScalar());
+		badge.BadgeId = newId;
+
+		return badge;
 	}
 
 	public Badge Delete(int id)
