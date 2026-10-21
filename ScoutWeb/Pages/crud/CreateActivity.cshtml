@@ -45,14 +45,17 @@
         <input asp-for="MinAge" />
         <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
-
-    @foreach (Badge badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
-    {
-        <div>
-            <input type="checkbox" id="badge_@badge.BadgeId" name="RequiredBadges" value="@badge.BadgeId" />
-            <label for="badge_@badge.BadgeId">@badge.Name</label>
-        </div>
-    }
+    @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
+        {
+            @foreach (Badge badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
+            {
+                <div>
+                    <input type="checkbox" id="badge_@badge.BadgeId" name="RequiredBadges" value="@badge.BadgeId" />
+                    <label for="badge_@badge.BadgeId">@badge.Name</label>
+                </div>
+            }
+        }
+    
     <!-- Submit knap -->
     <button type="submit">Opret aktivitet</button>
 </form>
