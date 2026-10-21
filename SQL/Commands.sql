@@ -1,0 +1,1 @@
+-- one time only sql queries here

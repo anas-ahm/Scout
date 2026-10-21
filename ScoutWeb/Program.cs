@@ -1,5 +1,7 @@
 using ScoutLibrary.Repositories;
 using Activity = ScoutLibrary.Models.Activity;
+using ScoutLibrary.Models;
+using ScoutLibrary.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ScoutLibrary.DBWorker>();
 builder.Services.AddScoped<ICRUD<Activity>, ActivityRepository>();
+builder.Services.AddScoped<ICRUD<Member>, MemberRepository>();
+builder.Services.AddScoped<ScoutService>();
+
 
 var app = builder.Build();
 

@@ -29,7 +29,9 @@ namespace ScoutLibrary
         /// <exception cref="InvalidOperationException">Thrown when the `DB_CONNECTION_STRING` environment variable is not set.</exception>
         public DBWorker()
         {
-            Env.Load();
+            // Walks up from the current directory looking for a .env file
+            Env.TraversePath().Load();
+            
             _connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
                 ?? throw new InvalidOperationException("CONNECTION_STRING environment variable is not set.");
         }

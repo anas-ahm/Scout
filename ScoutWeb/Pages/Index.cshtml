@@ -4,7 +4,23 @@
     ViewData["Title"] = "Home page";
 }
 
+<!-- SuccesMessage after redirects-->
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+<!-- end -->
+
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+
+
+<!-- Button for create Scout for leaders -->
+<a asp-page="/crud/CreateMember">Opret Spejder</a>
+<!-- end -->
