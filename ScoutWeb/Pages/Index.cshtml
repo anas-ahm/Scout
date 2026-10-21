@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using ScoutLibrary.Models
 @{
     ViewData["Title"] = "Home page";
 }
@@ -14,12 +15,35 @@
 <!-- end -->
 
 
+<!-- ErrorMessages after calls -->
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+<!-- end -->
+
+
 <div class="text-center">
     <h1 class="display-4">Velkommen til de lysserøde spejdere</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
 
+<!-- List over all Scouts-->
+@foreach (Member member in @Model.memberList)
+{
+    <div class="member">
+        <span>@member.FirstName @member.LastName</span>
+        <span>@member.DateOfBirth.ToString("dd-MM-yyyy")</span>
+        <span>@member.PhoneNumber</span>
+        <span>@member.Username</span>
+        <span>@(member.IsLeader ? "Leder" : "Spejder")</span>
+        <span></span>
+    </div>
+}
+<!-- end -->
 
 <!-- Button for create Scout for leaders -->
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
