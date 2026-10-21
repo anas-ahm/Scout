@@ -10,6 +10,7 @@ namespace ScoutWeb.Pages.crud
     {
         private readonly ICRUD<Activity> _activityRepository;
         private readonly ICRUD<Badge> _badgeRepository;
+        private readonly ICRUD<Member> _memberRepository;
 
         [BindProperty]
         public string Name { get; set; }
@@ -22,21 +23,28 @@ namespace ScoutWeb.Pages.crud
         [BindProperty]
         public int? MinAge { get; set; }
         [BindProperty]
-        public List<Badge>? RequiredBadges { get; set; }
+        public List<int>? RequiredBadges { get; set; }  //gemmes som int, da man ikke kan bruge hele objekter i checkbokse
+        [BindProperty]
+        public List<int> Members { get; set; } //se ovenfor
+        
 
-        // Denne liste bruges til at vise alle tilgængelige badges i HTML-formularen
-        public List<Badge> AvailableBadges { get; set; } = new List<Badge>();
+        // Denne liste bruges til at vise alle eksisterende badges og ledere i HTML-formularen
+        public List<Badge> AvailableBadges { get; set; } = new List<Badge>();        
+        public List<Member> AvailableLeaders { get; set; } = new();
+        
 
 
-        public CreateActivityModel(ICRUD<Activity> activityRepository, ICRUD<Badge> badgeRepository)
+        public CreateActivityModel(ICRUD<Activity> activityRepository, ICRUD<Badge> badgeRepository, ICRUD<Member> memberRepository)
         {
             _activityRepository = activityRepository;
-            _badgeRepository = badgeRepository;            
+            _badgeRepository = badgeRepository;
+            _memberRepository = memberRepository;
         }
 
         public void OnGet()
         {
             AvailableBadges = _badgeRepository.GetAll();
+            AvailableLeaders = _memberRepository.GetAll().Where(leader => leader.IsLeader).ToList();
         }
 
 
@@ -48,15 +56,19 @@ namespace ScoutWeb.Pages.crud
                 return Page();
             }
 
-            Activity activity = new Activity 
-            { 
-                Name = Name, 
-                DateTime = DateTime, 
-                Description = Description, 
-                MaxCount = MaxCount, 
-                MinAge = MinAge, 
-                RequiredBadges = RequiredBadges, 
-                Members = null                          //kan evt automatisk tilføje den leder, der oprettede aktiviteten
+            //ID'er skal omdannes til objekter inden de gemmes i Activity objektet.
+            List<Badge> selectedBadges = AvailableBadges.Where(b => RequiredBadges.Contains(b.BadgeId)).ToList();
+            List<Member> selectedMembers = AvailableLeaders.Where(m=>Members.Contains(m.MemberId)).ToList();
+
+            Activity activity = new Activity
+            {
+                Name = Name,
+                DateTime = DateTime,
+                Description = Description,
+                MaxCount = MaxCount,
+                MinAge = MinAge,
+                RequiredBadges = selectedBadges,
+                Members = selectedMembers                      
             };
 
             try
