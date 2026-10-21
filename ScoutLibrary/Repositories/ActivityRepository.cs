@@ -81,7 +81,68 @@ namespace ScoutLibrary.Repositories
 
         public List<Activity> GetAll()
         {
-            throw new NotImplementedException();
+            //Dictionary: holder styr på unikke aktiviteter baseret på ID. Nødvendig pga LEFT JOIN
+            Dictionary<int, Activity> activityDictionary = new Dictionary<int, Activity>();
+            
+            using (MySqlConnection connection = _db.Connect2())
+            {
+                string activitiesQuery = """
+                    SELECT a.activity_id, a.date_time, a.description AS activity_description, a.max_count, a.min_age, a.name AS activity_name, ab.badge_id, b.name AS badge_name, b.description AS badge_description
+                    FROM activities a 
+                    LEFT JOIN required_activity_badges ab ON a.activity_id=ab.activity_id
+                    LEFT JOIN badges b ON ab.badge_id=b.badge_id
+                    """;
+                using MySqlCommand activitiesCmd = new MySqlCommand(activitiesQuery, connection);
+                using MySqlDataReader reader = activitiesCmd.ExecuteReader();
+                              
+
+                while (reader.Read())
+                {
+                    //Hent activity_id fra databasen (key-value!), check i ordbogen for at se om aktiviteten allerede eksisterer. Gør den ikke, laves en Activity
+                    int activityId = reader.GetInt32("activity_id");
+                    if (!activityDictionary.ContainsKey(activityId))
+                    {
+                        Activity a = new Activity
+                        {
+                            ActivityId = activityId,
+                            Name = reader.GetString("activity_name"),
+                            DateTime = reader.GetDateTime("date_time"),
+
+                            //check for DBNull før vi læser. Se bunden for forklaring af GetOrdinal
+                            Description = reader.IsDBNull(reader.GetOrdinal("activity_description")) ? null : reader.GetString("description"),
+                            MaxCount = reader.IsDBNull(reader.GetOrdinal("max_count")) ? null : reader.GetInt32("max_count"),
+                            MinAge = reader.IsDBNull(reader.GetOrdinal("min_age")) ? null : reader.GetInt32("min_age"),
+
+                            //opretter tomme lister, som vi fylder op senere
+                            RequiredBadges = new List<Badge>(),
+                            Members = new List<Member>()
+
+                        };
+
+                        activityDictionary.Add(activityId,a);
+                    }
+
+
+                    //check om der er et badge tilknyttet i denne række (kan være null pga left join)
+                    if (!reader.IsDBNull(reader.GetOrdinal("badge_id")))
+                    {
+                        Badge badge = new Badge
+                        {
+                            BadgeId = reader.GetInt32("badge_id"),
+                            Name = reader.GetString("badge_name"), 
+                            Description = reader.IsDBNull(reader.GetOrdinal("badge_description")) ? null : reader.GetString("description")
+                        };
+
+                        // Tilføj badge til listen RequiredBadges i Activity.
+                        activityDictionary[activityId].RequiredBadges.Add(badge);
+                    }
+
+                }
+                List<Activity> activities = activityDictionary.Values.ToList();
+
+
+            }
+            return activityDictionary.Values.ToList();
         }
 
         public Activity GetById(int id)
@@ -95,3 +156,11 @@ namespace ScoutLibrary.Repositories
         }
     }
 }
+
+//****************GetOrdinal*****************************************************************
+//når du skal tjekke for NULL-værdier ved hjælp af metoden IsDBNull(),
+//accepterer IsDBNUll() kun et heltal (kolonnens indeks, f.eks. kolonne 0, 1, 2 osv.) – den modtager ikke tekst.
+//Det er her GetOrdinal kommer ind i billedet som en brobygger:
+//Du beder GetOrdinal om at finde nummeret på f.eks. "activity_description".
+//Den kigger på din SQL-forespørgsel, tæller sig frem og finder ud af, at activity_description f.eks. er kolonne nr. 3.
+//Den sender det tal videre til IsDBNull(3), som så tjekker om feltet er tomt.
