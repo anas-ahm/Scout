@@ -24,5 +24,20 @@ namespace ScoutLibrary.Service
         {
             return _activityRepository.GetAll();
         }
+
+        public Activity GetById(int id)
+        {
+            return _activityRepository.GetById(id);
+        }
+
+        public Activity Delete(int id)
+        {
+            return _activityRepository.Delete(id);
+        }
+
+        public Activity Update(Activity item, int id)
+        {
+            return _activityRepository.Update(item, id);
+        }
     }
 }
