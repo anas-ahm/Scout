@@ -1,0 +1,23 @@
+﻿@page
+@model ScoutWeb.Pages.LoginModel
+@{
+}
+
+<h1>Login</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div>
+        <label asp-for="Input.Username">Brugernavn</label>
+        <input asp-for="Input.Username" />
+		<span asp-validation-for="Input.Username"></span>
+    </div>
+
+    <div>
+        <label asp-for="Input.Password">Adgangskode</label>
+        <input asp-for="Input.Password" type="password" />
+        <span asp-validation-for="Input.Password"></span>
+    </div>
+
+    <button type="submit">Log ind</button>
+</form>

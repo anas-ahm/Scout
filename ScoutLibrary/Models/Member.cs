@@ -1,4 +1,6 @@
-﻿namespace ScoutLibrary.Models
+﻿using K4os.Compression.LZ4.Internal;
+
+namespace ScoutLibrary.Models
 {
     public class Member
     {
@@ -15,7 +17,7 @@
 
         // Constructor
         public Member(int memberId, string firstName, string lastName, string phoneNumber,
-            DateTime dateOfBirth, bool isLeader, string username, string hashPassword)
+            DateTime dateOfBirth, bool isLeader, string username)
         {
             MemberId = memberId;
             FirstName = firstName;
@@ -24,6 +26,12 @@
             DateOfBirth = dateOfBirth;
             IsLeader = isLeader;
             Username = username;
+        }
+
+        public Member(int memberId, string firstName, string lastName, string phoneNumber,
+            DateTime dateOfBirth, bool isLeader, string username, string hashPassword):
+            this(memberId, firstName, lastName, phoneNumber, dateOfBirth, isLeader, username)
+        {
             HashPassword = hashPassword;
         }
 
@@ -42,6 +50,11 @@
             }
 
             return age;
+        }
+
+        public string GetFullName()
+        {
+            return $"{FirstName} {LastName}";
         }
     }
 }

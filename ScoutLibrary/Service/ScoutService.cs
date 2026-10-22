@@ -1,6 +1,7 @@
-namespace ScoutLibrary.Service;
 using ScoutLibrary.Models;
 using ScoutLibrary.Repositories;
+
+namespace ScoutLibrary.Service;
 
 public class ScoutService
 {
