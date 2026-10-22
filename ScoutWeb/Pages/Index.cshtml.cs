@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScoutLibrary.Models;
+using ScoutLibrary.Repositories;
+using System.Security.Claims;
 using ScoutLibrary.Service;
 
 namespace ScoutWeb.Pages;
@@ -10,26 +13,40 @@ public class IndexModel : PageModel
     // Connecting to Servivce
     private readonly ScoutService _scoutService;
     private readonly ActivityService _activityService;
-    
-    // ILogger used to log exceptions in production code for us (devs) inside terminal
-    // Users only see a generic error code
-    private readonly ILogger<IndexModel> _logger;
-
-    public IndexModel(ScoutService scoutService, ActivityService activityService, ILogger<IndexModel> logger)
-    {
-        _scoutService = scoutService;
-        _activityService = activityService;
-        _logger = logger;
-    }
+    private readonly ICRUD<Member> _memberRepository;
 
     // Parameters to be used on page
     public List<Member> memberList = new List<Member>();
     public List<Activity> AllActivities = new List<Activity>();
     public string? ErrorMessage { get; set; }
 
+    // Member object to hold the currently logged-in member's information
+    public Member LoggedInMember { get; set; }
+    
+    // ILogger used to log exceptions in production code for us (devs) inside terminal
+    // Users only see a generic error code
+    private readonly ILogger<IndexModel> _logger;
+
+    public IndexModel(ScoutService scoutService, ActivityService activityService, ICRUD<Member> memberRepository, ILogger<IndexModel> logger)
+    {
+        _scoutService = scoutService;
+        _activityService = activityService;
+        _memberRepository = memberRepository;
+        _logger = logger;
+    }
+
     // Runs when page is loaded
     public void OnGet()
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            int id = int.Parse(userId);
+
+            LoggedInMember = _memberRepository.GetById(id);
+        }
+
         try
         {
             memberList = _scoutService.ReadAllMembers();

@@ -36,9 +36,8 @@
 
 
 <div class="text-center">
-    <h1>Velkommen [person] </h1>
+    <h1>Velkommen @(@Model.LoggedInMember != null ? @Model.LoggedInMember.GetFullName() : "gæst") </h1>
 </div>
-
 
 
 <!-- Button for create Activity for leaders -->
@@ -96,6 +95,15 @@
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
 
+<!-- Show login/logout links depending on whether the user is authenticated or not -->
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-page="/Logout">Log ud</a>
+}
+else
+{
+    <a asp-page="/Login">Log ind</a>
+}
 
 
 <!-- List over all Scouts-->
