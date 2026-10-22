@@ -1,5 +1,24 @@
-@page
+@page "{id:int}"
 @model ScoutWeb.Pages.crud.MemberDetailsModel
+@using ScoutLibrary.Models
 @{
 }
+
+<!-- Detail section for members -->
+@if (!Model.memberFound)
+{
+    <p>Scout not found!</p>
+    <a asp-page="/Index">Go back to Home Page</a>
+}
+else
+{
+    <div>
+        <span>@Model.memberToShow!.FirstName @Model.memberToShow.LastName</span>
+        <span>@Model.memberToShow.DateOfBirth.ToString("dd-MM-yyyy")</span>
+        <span>@Model.memberToShow.PhoneNumber</span>
+        <span>@Model.memberToShow.Username</span>
+        <span>@(Model.memberToShow.IsLeader ? "Leder" : "Spejder")</span>
+    </div>
+}
+<!-- end -->
 

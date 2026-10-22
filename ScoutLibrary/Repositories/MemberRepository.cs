@@ -56,7 +56,32 @@ namespace ScoutLibrary.Repositories
         
         public Member Delete(int id)
         {
-            throw new NotImplementedException();
+            int rowsDeleted;
+            
+            try
+            {
+                string sql = "DELETE FROM members WHERE member_id = @id";
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+
+                cmd.Parameters.AddWithValue("id", id);
+                rowsDeleted = cmd.ExecuteNonQuery();
+
+            }
+            
+            catch (Exception ex)
+            {
+                throw new Exception("Fejl opstået", ex);
+            }
+            
+            if (rowsDeleted == 0)
+            {
+                throw new KeyNotFoundException("Medlemmet blev ikke fundet.");
+            }
+            
+            return new Member { MemberId = id };
         }
 
         public Member Update(Member member, int id)
@@ -64,40 +89,77 @@ namespace ScoutLibrary.Repositories
             throw new NotImplementedException();
         }
 
-        public Member GetById(int id)
+        public Member? GetById(int id)
         {
-            const string query = """
-            SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username, password FROM members
-            WHERE member_id = @member_id
-            """;
-
-            using MySqlConnection conn = _db.Connect();
-
-            using MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@member_id", id);
-
-            using MySqlDataReader reader = cmd.ExecuteReader();
-
-            if (!reader.Read())
+            try
             {
-                throw new KeyNotFoundException($"Ingen spejder fundet med ID: {id}.");
-            }
+                string sql = "SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members WHERE member_id = @member_id";
 
-            return new Member(
-                memberId: reader.GetInt32("member_id"),
-                firstName: reader.GetString("first_name"),
-                lastName: reader.GetString("last_name"),
-                dateOfBirth: reader.GetDateTime("date_of_birth"),
-                phoneNumber: reader.GetString("phone_number"),
-                isLeader: reader.GetBoolean("is_leader"),
-                username: reader.GetString("username"),
-                hashPassword: reader.GetString("password")
-            );
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+                cmd.Parameters.AddWithValue("member_id", id);
+
+                using MySqlDataReader reader = cmd.ExecuteReader();
+                
+                if (!reader.Read())
+                {
+                    return null;
+                }
+                
+                Member memberToRead = new Member();
+                memberToRead.MemberId = reader.GetInt32("member_id");
+                memberToRead.FirstName = reader.GetString("first_name");
+                memberToRead.LastName = reader.GetString("last_name");
+                memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
+                memberToRead.PhoneNumber = reader.GetString("phone_number");
+                memberToRead.IsLeader = reader.GetBoolean("is_leader");
+                memberToRead.Username = reader.GetString("username");
+                
+                return memberToRead;
+            }
+            
+            // Throws a KeyNotFoundException if member is null 
+            catch (Exception ex)
+            {
+                throw new Exception("Noget gik galt ved at hente spejder: ", ex);
+            }
         }
 
         public List<Member> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = """ SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members ORDER BY first_name""";
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+
+                using MySqlDataReader reader = cmd.ExecuteReader();
+
+                List<Member> memberList = new List<Member>();
+                while (reader.Read())
+                {
+                    Member memberToAdd = new Member();
+                    memberToAdd.MemberId = reader.GetInt32("member_id");
+                    memberToAdd.FirstName = reader.GetString("first_name");
+                    memberToAdd.LastName = reader.GetString("last_name");
+                    memberToAdd.DateOfBirth = reader.GetDateTime("date_of_birth");
+                    memberToAdd.PhoneNumber = reader.GetString("phone_number");
+                    memberToAdd.IsLeader = reader.GetBoolean("is_leader");
+                    memberToAdd.Username = reader.GetString("username");
+                
+                    memberList.Add(memberToAdd);
+                }
+
+                return memberList;   
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Der opstod en fejl ved hentningen af spejdere ", ex);
+            }
+            
         }
 
 		public Member GetByUsername(string username)

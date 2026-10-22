@@ -1,7 +1,8 @@
 ﻿@page
 @model ScoutWeb.Pages.crud.CreateActivityModel
+@using ScoutLibrary.Models;
 @{
-    ViewData["Title"] = "Opret aktivitet";
+    ViewData["Title"] = "Opret aktivitet";    
 }
 
 <h1>Opret ny aktivitet</h1>
@@ -45,13 +46,38 @@
         <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
 
-    @foreach (var badge in Model.RequiredBadges)    //asp-for bruges kun når der skal gemmes en enkelt værdi. Derfor ikke brugt her.
+    <!-- 1. Vælg mærker (Looper igennem AvailableBadges, gemmer i RequiredBadges) -->
+    @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
     {
         <div>
-            <input type="checkbox" id="badge_@badge.BadgeId" name="RequiredBadges" value="@badge.BadgeId" />
-            <label for="badge_@badge.BadgeId">@badge.Name</label>
+            <label for="SelectedBadges">Vælg tegn:</label>
+            <select name="SelectedBadges" id="SelectedBadges" multiple>
+                @foreach (Badge badge in Model.AvailableBadges)
+                {
+                    <option value="@badge.BadgeId">@badge.Name</option>
+                }
+            </select>
+            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
         </div>
     }
+
+    <!-- 2. Vælg ledere (Looper igennem AvailableLeaders, gemmer i Members) -->
+    @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
+    {
+        <div>
+            <label for="SelectedLeaders">Vælg leder:  </label>
+            <select name="SelectedLeaders" id="SelectedLeaders" multiple>
+                    @foreach(Member leader in Model.AvailableLeaders)
+                    {
+                        <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
+                    }
+                </select>
+            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+            <!-- Denne linje udskriver fejlen, hvis ingen er valgt -->
+            <span asp-validation-for="SelectedLeaders" class="text-danger"></span>
+        </div>
+    }   
+
     <!-- Submit knap -->
     <button type="submit">Opret aktivitet</button>
 </form>

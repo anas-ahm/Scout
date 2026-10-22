@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScoutLibrary.Repositories;
 using ScoutLibrary.Models;
 using Activity = ScoutLibrary.Models.Activity;
+using ScoutLibrary.Service;
+using System.ComponentModel.Design.Serialization;
 
 namespace ScoutWeb.Pages.crud
 {
     public class CreateActivityModel : PageModel
     {
-        private readonly ICRUD<Activity> _activityRepository;
+        private readonly ActivityService _activityService;
+        private readonly BadgeService _badgeService;
+        private readonly ScoutService _memberService;
 
         [BindProperty]
         public string Name { get; set; }
@@ -21,44 +25,70 @@ namespace ScoutWeb.Pages.crud
         [BindProperty]
         public int? MinAge { get; set; }
         [BindProperty]
-        public List<Badge> RequiredBadges { get; set; }
+        public List<int>? SelectedBadges { get; set; } = new List<int>();
+        [BindProperty]
+        public List<int> SelectedLeaders { get; set; } = new List<int>();
 
-        // NY: Denne liste bruges til at vise alle tilgængelige mærker i HTML-formularen
-        public List<Badge> AvailableBadges { get; set; } = new();
+        // Denne liste bruges til at vise alle eksisterende badges og ledere i HTML-formularen
+        public List<Badge>? AvailableBadges { get; set; } = new List<Badge>();
+        public List<Member>? AvailableLeaders { get; set; } = new List<Member>();
 
 
-        public CreateActivityModel(ICRUD<Activity> activityRepository)
+        public CreateActivityModel(ActivityService activityService, BadgeService badgeService, ScoutService memberService)
         {
-            _activityRepository = activityRepository;            
+            _activityService = activityService;
+            _badgeService = badgeService;
+            _memberService = memberService;
         }
 
         public void OnGet()
         {
-            AvailableBadges = new List<Badge>();
+            AvailableBadges = _badgeService.GetAll();
+            AvailableLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();
         }
 
 
         public IActionResult OnPost()
         {
+            //betingelser gemmes INDEN man checker modelstate, for at blive kontrolleret og vist
+            if (SelectedLeaders == null || SelectedLeaders.Count == 0)
+            {
+                ModelState.AddModelError("SelectedLeaders", "Du skal vælge mindst én leder til aktiviteten.");
+            }
+
             if (!ModelState.IsValid)
             {
                 OnGet();
                 return Page();
             }
-            Activity activity = new Activity 
-            { 
-                Name = Name, 
-                DateTime = DateTime, 
-                Description = Description, 
-                MaxCount = MaxCount, 
-                MinAge = MinAge, 
-                RequiredBadges = RequiredBadges, 
-                Members = null 
+            //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
+            var allBadges = _badgeService.GetAll();
+            var allLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();
+
+            //Listen af valgte id'er som er bundet via BindModel bruges til at lave en liste af objekterne:
+            var requiredBadges = allBadges
+                                .Where(b => SelectedBadges?.Contains(b.BadgeId) == true)
+                                .ToList();
+
+            var members = allLeaders
+                        .Where(l => SelectedLeaders?.Contains(l.MemberId) == true)
+                        .ToList();
+
+
+            Activity activity = new Activity
+            {
+                Name = Name,
+                DateTime = DateTime,
+                Description = Description,
+                MaxCount = MaxCount,
+                MinAge = MinAge,
+                RequiredBadges = requiredBadges,
+                Members = members
             };
 
             try
             {
-                _activityRepository.Create(activity);
+                _activityService.Create(activity);
                 TempData["SuccessMessage"] = "Aktivitet oprettet succesfuldt!";
                 return RedirectToPage("/Index");
             }
