@@ -3,3 +3,21 @@
 
 @{
 }
+@using ScoutLibrary.Models;
+
+<div>
+    <p>@Model.activity.Name</p>
+    <p>@Model.activity.ActivityId</p>
+    <p>@Model.activity.DateTime</p>
+    <p>@Model.activity.MaxCount</p>
+    <p>@Model.activity.MinAge</p>
+    <p>@Model.activity.Description</p>
+        
+    @foreach(Badge b in Model.activity.RequiredBadges)
+    {
+        <p>@b.BadgeId</p>
+        <p>@b.Name</p>
+        <p>@b.Description</p>
+    }
+    
+</div>
