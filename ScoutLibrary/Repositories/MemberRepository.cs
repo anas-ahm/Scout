@@ -89,9 +89,41 @@ namespace ScoutLibrary.Repositories
             throw new NotImplementedException();
         }
 
-        public Member GetById(int id)
+        public Member? GetById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = "SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members WHERE member_id = @member_id";
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+                cmd.Parameters.AddWithValue("member_id", id);
+
+                using MySqlDataReader reader = cmd.ExecuteReader();
+                
+                if (!reader.Read())
+                {
+                    return null;
+                }
+                
+                Member memberToRead = new Member();
+                memberToRead.MemberId = reader.GetInt32("member_id");
+                memberToRead.FirstName = reader.GetString("first_name");
+                memberToRead.LastName = reader.GetString("last_name");
+                memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
+                memberToRead.PhoneNumber = reader.GetString("phone_number");
+                memberToRead.IsLeader = reader.GetBoolean("is_leader");
+                memberToRead.Username = reader.GetString("username");
+                
+                return memberToRead;
+            }
+            
+            // Throws a KeyNotFoundException if member is null 
+            catch (Exception ex)
+            {
+                throw new Exception("Noget gik galt ved at hente spejder: ", ex);
+            }
         }
 
         public List<Member> GetAll()

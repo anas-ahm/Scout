@@ -26,4 +26,9 @@ public class ScoutService
         return _memberRepo.Delete(id);
     }
 
+    public Member GetById(int id)
+    {
+        return _memberRepo.GetById(id);
+    }
+
 }

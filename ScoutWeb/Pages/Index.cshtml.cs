@@ -53,6 +53,12 @@ public class IndexModel : PageModel
         }
     }
     
+    // OnPost for viewing a members memberDetails page
+    public void OnPostSeeMemberDetails(int id)
+    {
+        
+    }
+    
     // OnPost for cofirmation of deletion
     public IActionResult OnPostConfirmMemberDeletion(int id)
     {
