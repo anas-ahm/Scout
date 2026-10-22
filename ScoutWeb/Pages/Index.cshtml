@@ -15,12 +15,20 @@
 <!-- end -->
 
 
-
 <!-- ErrorMessages after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <div class="error-message" role="alert">
         @Model.ErrorMessage
+    </div>
+}
+<!-- end -->
+
+<!-- ErrorMessage after redirects (for instance: member not found on the details page) -->
+@if (TempData["ErrorMessage"] is string redirectedErrorMessage)
+{
+    <div class="error-message" role="alert">
+        @redirectedErrorMessage
     </div>
 }
 <!-- end -->
