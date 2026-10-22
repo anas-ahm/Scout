@@ -15,7 +15,6 @@
 <!-- end -->
 
 
-
 <!-- ErrorMessages after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
@@ -25,11 +24,28 @@
 }
 <!-- end -->
 
+<!-- ErrorMessage after redirects (for instance: member not found on the details page) -->
+@if (TempData["ErrorMessage"] is string redirectedErrorMessage)
+{
+    <div class="error-message" role="alert">
+        @redirectedErrorMessage
+    </div>
+}
+<!-- end -->
 
 
+
+<!-- Personal profile section -->
 <div class="text-center">
     <h1>Velkommen @(@Model.LoggedInMember != null ? @Model.LoggedInMember.GetFullName() : "gæst") </h1>
+    
+    @if (Model.LoggedInMember != null)
+    {
+        <a asp-page="/crud/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
+    }
 </div>
+<!-- end -->
+
 
 
 <!-- Button for create Activity for leaders -->

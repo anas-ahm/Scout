@@ -19,26 +19,18 @@ public class MemberDetailsModel : PageModel
     public bool memberFound { get; set; }
     
     
-    public void OnGet(int id)
+    public IActionResult OnGet(int id)
     {
+        memberToShow = _scoutService.GetById(id);
 
-        try
+        if (memberToShow == null)
         {
-            memberToShow = _scoutService.GetById(id);
+            TempData["ErrorMessage"] = "Spejderen blev ikke fundet!";
+            return RedirectToPage("/Index");
+        }
 
-            if (memberToShow == null)
-            {
-                memberFound = false;
-            }
-            else
-            {
-                memberFound = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Noget gik galt:, ", ex);
-        }
+        memberFound = true;
+        return Page();
     }
     
     

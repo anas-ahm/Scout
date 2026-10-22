@@ -21,7 +21,7 @@ public class IndexModel : PageModel
     public string? ErrorMessage { get; set; }
 
     // Member object to hold the currently logged-in member's information
-    public Member LoggedInMember { get; set; }
+    public Member? LoggedInMember { get; set; }
     
     // ILogger used to log exceptions in production code for us (devs) inside terminal
     // Users only see a generic error code
