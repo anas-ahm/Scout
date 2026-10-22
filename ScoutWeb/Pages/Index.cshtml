@@ -91,6 +91,24 @@
                         <span class="text-muted">Ingen tilmeldte</span>
                     }
                 </td>
+                
+                @if (@Model.LoggedInMember != null)
+                {
+                    if (!Model.AssignedActivityIds.Contains(a.ActivityId))
+                    {
+                        <form method="post" asp-page-handler="AssignActivity" asp-route-activityId="@a.ActivityId">
+                            <button type="submit">Tilmeld aktivitet</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId">
+                            <button type="submit">Afmeld aktivitet</button>
+                        </form>
+                    }
+                }
+                
+                
             </tr>
         }
     </tbody>
@@ -131,6 +149,8 @@ else
               onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
             <button type="submit">Slet</button>
         </form>
+        
+        <a asp-page="/crud/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
         
     </div>
 }

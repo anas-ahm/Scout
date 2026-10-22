@@ -23,6 +23,9 @@ public class IndexModel : PageModel
     // Member object to hold the currently logged-in member's information
     public Member? LoggedInMember { get; set; }
     
+    // List for storing the activity id's the logged in member is signed up for.
+    public List<int?> AssignedActivityIds { get; private set; } = new();
+    
     // ILogger used to log exceptions in production code for us (devs) inside terminal
     // Users only see a generic error code
     private readonly ILogger<IndexModel> _logger;
@@ -45,6 +48,10 @@ public class IndexModel : PageModel
             int id = int.Parse(userId);
 
             LoggedInMember = _memberRepository.GetById(id);
+
+            // LINQ Select that goes through all the logged in members Activities, selects the id's
+            // and puts them into AssignedActivityIds
+            AssignedActivityIds = LoggedInMember.Activities.Select(x => x.ActivityId).ToList();        
         }
 
         try
@@ -92,5 +99,19 @@ public class IndexModel : PageModel
         return Page();
     }
     
+    
+    
+    // OnPost for signing up for an activity
+    public IActionResult OnPostAssignActivity(int activityId)
+    {
+        return RedirectToPage();
+    }
+    
+    
+    // OnPost for Unassigning up for an activity
+    public IActionResult OnPostUnAssignActivity()
+    {
+        return RedirectToPage();
+    }
     
 }

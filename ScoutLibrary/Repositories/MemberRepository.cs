@@ -86,7 +86,40 @@ namespace ScoutLibrary.Repositories
 
         public Member Update(Member member, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = """
+                             UPDATE members 
+                             SET first_name = @first_name, last_name = @last_name, date_of_birth = @date_of_birth, phone_number = @phone_number, is_leader = @is_leader, username = @username 
+                             WHERE member_id = @member_id
+                             """;
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+                cmd.Parameters.AddWithValue("@first_name", member.FirstName);
+                cmd.Parameters.AddWithValue("@last_name", member.LastName);
+                cmd.Parameters.AddWithValue("@date_of_birth", member.DateOfBirth);
+                cmd.Parameters.AddWithValue("@phone_number", member.PhoneNumber);
+                cmd.Parameters.AddWithValue("@is_leader", member.IsLeader);
+                cmd.Parameters.AddWithValue("@username", member.Username);
+                cmd.Parameters.AddWithValue("@member_id", id);
+
+                cmd.ExecuteNonQuery();
+            }
+            
+            // this catch, is if username is already taken.
+            catch(MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+            {
+                throw new Exception("Brugernavnet er allerede i brug.", ex);
+            }
+            
+            // remaining exceptions
+            catch(Exception ex)
+            {
+                throw new Exception("Der opstod en fejl, da du prøvede at oprette en spejder!", ex);
+            }
+            
+            return member;
         }
 
         public Member? GetById(int id)

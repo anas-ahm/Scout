@@ -32,4 +32,9 @@ public class ScoutService
         return _memberRepo.GetById(id);
     }
 
+    public Member Update(Member member, int id)
+    {
+        return _memberRepo.Update(member, id);
+    }
+
 }
