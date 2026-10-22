@@ -47,8 +47,13 @@
     <h1>Velkommen [person] </h1>
 </div>
 
+
+<!-- Button for create Activity for leaders -->
+<a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
+<!-- end -->
+
 <!--Liste oversigt over alle aktiviter-->
-<h1>Activities</h1>
+<h1>Aktiviteter</h1>
 <table class="table">
     <thead>
         <tr>
@@ -90,6 +95,12 @@
 </table>
 
 
+
+
+<!-- Button for create Scout for leaders -->
+<a asp-page="/crud/CreateMember">Opret Spejder</a>
+<!-- end -->
+
 <!-- List over all Scouts-->
 <h1>Medlemmer</h1>
 @foreach (Member member in @Model.memberList)
@@ -112,12 +123,3 @@
 
 
 
-<!-- Button for create Scout for leaders -->
-<a asp-page="/crud/CreateMember">Opret Spejder</a>
-<!-- end -->
-
-
-
-<!-- Button for create Activity for leaders -->
-<a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
-<!-- end -->
