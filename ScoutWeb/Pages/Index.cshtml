@@ -35,9 +35,17 @@
 
 
 
+<!-- Personal profile section -->
 <div class="text-center">
     <h1>Velkommen @(@Model.LoggedInMember != null ? @Model.LoggedInMember.GetFullName() : "gæst") </h1>
+    
+    @if (Model.LoggedInMember != null)
+    {
+        <a asp-page="/crud/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
+    }
 </div>
+<!-- end -->
+
 
 
 <!-- Button for create Activity for leaders -->
