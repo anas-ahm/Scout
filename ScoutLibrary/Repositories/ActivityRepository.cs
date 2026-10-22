@@ -247,7 +247,7 @@ namespace ScoutLibrary.Repositories
                                 ActivityId =id,
                                 Name = reader.GetString("name"),
                                 DateTime = reader.GetDateTime("date_time"),
-                                Description = reader.IsDBNull(reader.GetOrdinal("activity_description")) ? null : reader.GetString("activity_description"),
+                                Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
                                 MaxCount = reader.IsDBNull(reader.GetOrdinal("max_count")) ? null : reader.GetInt32("max_count"),
                                 MinAge = reader.IsDBNull(reader.GetOrdinal("min_age")) ? null : reader.GetInt32("min_age"),
                                 RequiredBadges = new List<Badge>(),

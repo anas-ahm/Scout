@@ -92,12 +92,25 @@
                         <span class="text-muted">Ingen tilmeldte</span>
                     }
                 </td>
-
-                <!--MODAL popup med ren HTML!___________ #Invoker Command API HTML attributes-->
+               
+                <!--EDIT DELETE BUTTONS FOR ACTIIVTY - LEADER ONLY***********************************************-->
                 <td>
+                    <div>
+                        <a asp-page="/crud/ActivityDetails" asp-route-id="@a.ActivityId" style="display:inline" ;>
+                            Se mere
+                        </a>
+                    </div>
+
+                    <div>
+                        <a asp-page="/crud/UpdateActivity" asp-route-id="@a.ActivityId" style="display:inline" ;>
+                            Rediger
+                        </a>
+                    </div>                                                              
+                        
+                    <!--MODAL popup med ren HTML!___________ #Invoker Command API HTML attributes-->
                     <button type="button" command="show-modal" commandfor="delete-dialog-@a.ActivityId">
                         Slet
-                    </button>                
+                    </button>      
                     <!-- 2. Selve dialogen med unikt ID -->
                     <dialog id="delete-dialog-@a.ActivityId">
                         <p>Vil du slette aktiviteten <strong>@a.Name</strong>?</p>
