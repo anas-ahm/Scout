@@ -44,13 +44,65 @@
 
 
 <div class="text-center">
-    <h1 class="display-4">Velkommen til de lysserøde spejdere</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1>Velkommen [person] </h1>
 </div>
 
 
+<!-- Button for create Activity for leaders -->
+<a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
+<!-- end -->
+
+<!--Liste oversigt over alle aktiviter-->
+<h1>Aktiviteter</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dato</th>
+            <th>Tid</th>
+            <th>Navn</th>
+            <th>Max Antal</th>
+            <th>Min Alder</th>
+            <th>Deltagere</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Activity a in Model.AllActivities)
+        {
+            <tr>
+                <!-- Split DateTime into Date and Time -->
+                <td>@a.DateTime.ToString("yyyy-MM-dd")</td>
+                <td>@a.DateTime.ToString("HH:mm")</td>
+
+                <!-- Activity properties -->
+                <td>@a.Name</td>
+                <td>@a.MaxCount</td>
+                <td>@a.MinAge</td>
+
+                <!-- Displaying Members/Leaders (showing their names or count) -->
+                <td>
+                    @if (a.Members != null && a.Members.Count > 0)
+                    {
+                        @string.Join(", ", a.Members.Select(m => m.FirstName))
+                    }
+                    else
+                    {
+                        <span class="text-muted">Ingen tilmeldte</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+<!-- Button for create Scout for leaders -->
+<a asp-page="/crud/CreateMember">Opret Spejder</a>
+<!-- end -->
 
 <!-- List over all Scouts-->
+<h1>Medlemmer</h1>
 @foreach (Member member in @Model.memberList)
 {
     <div class="member">
@@ -73,12 +125,3 @@
 
 
 
-<!-- Button for create Scout for leaders -->
-<a asp-page="/crud/CreateMember">Opret Spejder</a>
-<!-- end -->
-
-
-
-<!-- Button for create Activity for leaders -->
-<a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
-<!-- end -->
