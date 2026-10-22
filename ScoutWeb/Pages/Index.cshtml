@@ -8,49 +8,51 @@
 <!-- SuccesMessage after redirects-->
 @if (TempData["SuccessMessage"] is string successMessage)
 {
-    <div class="alert alert-success" role="alert">
+    <div class="success-message" role="alert">
         @successMessage
     </div>
 }
 <!-- end -->
 
 
-
-<!-- Pop up confirmation for deletion of member-->
-@if (Model.memberToDelete != 0)
-{
-    <div class="alert alert-warning">
-        <p>Er du sikker på, at du vil slette denne spejder?</p>
-        <form method="post" asp-page-handler="ConfirmMemberDeletion">
-            <input type="hidden" name="id" value="@Model.memberToDelete" />
-            <button type="submit">Ja, slet</button>
-            <a asp-page="/Index">Annuller</a>
-        </form>
-    </div>
-}
-<!-- end -->
-
-
-
 <!-- ErrorMessages after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div class="alert alert-danger" role="alert">
+    <div class="error-message" role="alert">
         @Model.ErrorMessage
     </div>
 }
 <!-- end -->
 
+<!-- ErrorMessage after redirects (for instance: member not found on the details page) -->
+@if (TempData["ErrorMessage"] is string redirectedErrorMessage)
+{
+    <div class="error-message" role="alert">
+        @redirectedErrorMessage
+    </div>
+}
+<!-- end -->
 
 
+
+<!-- Personal profile section -->
 <div class="text-center">
-    <h1>Velkommen [person] </h1>
+    <h1>Velkommen @(@Model.LoggedInMember != null ? @Model.LoggedInMember.GetFullName() : "gæst") </h1>
+    
+    @if (Model.LoggedInMember != null)
+    {
+        <a asp-page="/crud/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
+    }
 </div>
+<!-- end -->
+
 
 
 <!-- Button for create Activity for leaders -->
 <a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
 <!-- end -->
+
+
 
 <!--Liste oversigt over alle aktiviter-->
 <h1>Aktiviteter</h1>
@@ -127,6 +129,17 @@
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
 
+<!-- Show login/logout links depending on whether the user is authenticated or not -->
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-page="/Logout">Log ud</a>
+}
+else
+{
+    <a asp-page="/Login">Log ind</a>
+}
+
+
 <!-- List over all Scouts-->
 <h1>Medlemmer</h1>
 @foreach (Member member in Model.memberList)
@@ -140,8 +153,8 @@
         
         <a asp-page="/crud/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a>
         
-        <form method="post" asp-page-handler="AskDeletion">
-            <input type="hidden" name="id" value="@member.MemberId" />
+        <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId"
+              onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
             <button type="submit">Slet</button>
         </form>
         
