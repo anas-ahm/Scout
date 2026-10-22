@@ -12,6 +12,8 @@ builder.Services.AddScoped<ScoutLibrary.DBWorker>();
 builder.Services.AddScoped<ICRUD<Activity>, ActivityRepository>();
 builder.Services.AddScoped<ICRUD<Member>, MemberRepository>();
 builder.Services.AddScoped<ScoutService>();
+builder.Services.AddScoped<IMemberAuth, MemberRepository>();
+builder.Services.AddScoped<IMemberAuthService, MemberAuthService>();
 
 // Add cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>

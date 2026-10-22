@@ -10,10 +10,12 @@ namespace ScoutWeb.Pages.crud
     public class CreateMemberModel : PageModel
     {
         private readonly ScoutService _scoutService;
+        private readonly IMemberAuthService _memberAuthService;
 
-        public CreateMemberModel(ScoutService scoutService)
+        public CreateMemberModel(ScoutService scoutService, IMemberAuthService memberAuthService)
         {
             _scoutService = scoutService;
+            _memberAuthService = memberAuthService;
         }
         
         [BindProperty] 
@@ -49,7 +51,8 @@ namespace ScoutWeb.Pages.crud
 
             try
             {
-                _scoutService.CreateMember(memberToCreate);
+                // _scoutService.CreateMember(memberToCreate);
+                _memberAuthService.Register(memberToCreate);
             }
             catch (Exception ex)
             {
