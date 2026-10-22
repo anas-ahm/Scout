@@ -51,5 +51,10 @@ namespace ScoutLibrary.Models
 
             return age;
         }
+
+        public string GetFullName()
+        {
+            return $"{FirstName} {LastName}";
+        }
     }
 }

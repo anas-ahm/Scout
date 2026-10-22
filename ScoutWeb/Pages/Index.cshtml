@@ -19,8 +19,12 @@
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
+<!-- Temporary element to display logged-in user for testing auth and cookies -->
+<p>@(@Model.Member != null ? $"Logget ind som: {@Model.Member.GetFullName()} ({@Model.Member.Username})" : "Ikke logget ind")</p>
 
 
 <!-- Button for create Scout for leaders -->
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
+
+<a asp-page="/Login">Log ind</a>

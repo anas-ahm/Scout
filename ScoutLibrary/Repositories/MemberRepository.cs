@@ -66,7 +66,33 @@ namespace ScoutLibrary.Repositories
 
         public Member GetById(int id)
         {
-            throw new NotImplementedException();
+            const string query = """
+            SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username, password FROM members
+            WHERE member_id = @member_id
+            """;
+
+            using MySqlConnection conn = _db.Connect();
+
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@member_id", id);
+
+            using MySqlDataReader reader = cmd.ExecuteReader();
+
+            if (!reader.Read())
+            {
+                throw new KeyNotFoundException($"Ingen spejder fundet med ID: {id}.");
+            }
+
+            return new Member(
+                memberId: reader.GetInt32("member_id"),
+                firstName: reader.GetString("first_name"),
+                lastName: reader.GetString("last_name"),
+                dateOfBirth: reader.GetDateTime("date_of_birth"),
+                phoneNumber: reader.GetString("phone_number"),
+                isLeader: reader.GetBoolean("is_leader"),
+                username: reader.GetString("username"),
+                hashPassword: reader.GetString("password")
+            );
         }
 
         public List<Member> GetAll()
@@ -77,7 +103,7 @@ namespace ScoutLibrary.Repositories
 		public Member GetByUsername(string username)
 		{
 			const string query = """
-            SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members
+            SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username, password FROM members
             WHERE username = @username
             """;
 
@@ -100,7 +126,8 @@ namespace ScoutLibrary.Repositories
                 dateOfBirth: reader.GetDateTime("date_of_birth"),
                 phoneNumber: reader.GetString("phone_number"),
                 isLeader: reader.GetBoolean("is_leader"),
-                username: reader.GetString("username")
+                username: reader.GetString("username"),
+                hashPassword: reader.GetString("password")
             );
 		}
 	}
