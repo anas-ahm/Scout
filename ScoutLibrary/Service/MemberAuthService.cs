@@ -17,14 +17,20 @@ public class MemberAuthService : IMemberAuthService
 		_memberRepository = memberRepository;
 	}
 
-	public Member GetMemberByUsername(string username)
+	public Member? GetMemberByUsername(string username)
 	{
 		return _memberAuth.GetByUsername(username);
 	}
 
 	public Member Login(string username, string password)
 	{
-		Member member = _memberAuth.GetByUsername(username);
+		Member? member = _memberAuth.GetByUsername(username);
+
+		// IT Security: prevent enumeration attacks by throwing a generic exception for both invalid username and password
+		if (member == null)
+		{
+			throw new UnauthorizedAccessException("Brugernavn eller adgangskode er forkert.");
+		}
 
 		// Verify the password using the PasswordHasher
 		PasswordVerificationResult result =

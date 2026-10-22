@@ -4,5 +4,5 @@ namespace ScoutLibrary.Repositories;
 
 public interface IMemberAuth
 {
-	public Member GetByUsername(string username);
+	public Member? GetByUsername(string username);
 }
