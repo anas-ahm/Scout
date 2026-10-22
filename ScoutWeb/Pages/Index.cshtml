@@ -8,24 +8,8 @@
 <!-- SuccesMessage after redirects-->
 @if (TempData["SuccessMessage"] is string successMessage)
 {
-    <div class="alert alert-success" role="alert">
+    <div class="success-message" role="alert">
         @successMessage
-    </div>
-}
-<!-- end -->
-
-
-
-<!-- Pop up confirmation for deletion of member-->
-@if (Model.memberToDelete != 0)
-{
-    <div class="alert alert-warning">
-        <p>Er du sikker på, at du vil slette denne spejder?</p>
-        <form method="post" asp-page-handler="ConfirmMemberDeletion">
-            <input type="hidden" name="id" value="@Model.memberToDelete" />
-            <button type="submit">Ja, slet</button>
-            <a asp-page="/Index">Annuller</a>
-        </form>
     </div>
 }
 <!-- end -->
@@ -35,7 +19,7 @@
 <!-- ErrorMessages after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div class="alert alert-danger" role="alert">
+    <div class="error-message" role="alert">
         @Model.ErrorMessage
     </div>
 }
@@ -48,9 +32,12 @@
 </div>
 
 
+
 <!-- Button for create Activity for leaders -->
 <a asp-page="/crud/CreateActivity">Opret Aktivitet</a>
 <!-- end -->
+
+
 
 <!--Liste oversigt over alle aktiviter-->
 <h1>Aktiviteter</h1>
@@ -101,6 +88,8 @@
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
 
+
+
 <!-- List over all Scouts-->
 <h1>Medlemmer</h1>
 @foreach (Member member in @Model.memberList)
@@ -114,8 +103,8 @@
         
         <a asp-page="/crud/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a>
         
-        <form method="post" asp-page-handler="AskDeletion">
-            <input type="hidden" name="id" value="@member.MemberId" />
+        <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId"
+              onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
             <button type="submit">Slet</button>
         </form>
         

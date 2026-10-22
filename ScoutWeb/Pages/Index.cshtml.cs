@@ -10,18 +10,22 @@ public class IndexModel : PageModel
     // Connecting to Servivce
     private readonly ScoutService _scoutService;
     private readonly ActivityService _activityService;
+    
+    // ILogger used to log exceptions in production code for us (devs) inside terminal
+    // Users only see a generic error code
+    private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(ScoutService scoutService, ActivityService activityService)
+    public IndexModel(ScoutService scoutService, ActivityService activityService, ILogger<IndexModel> logger)
     {
         _scoutService = scoutService;
         _activityService = activityService;
+        _logger = logger;
     }
 
     // Parameters to be used on page
     public List<Member> memberList = new List<Member>();
     public List<Activity> AllActivities = new List<Activity>();
     public string? ErrorMessage { get; set; }
-    public int memberToDelete { get; set; }
 
     // Runs when page is loaded
     public void OnGet()
@@ -33,30 +37,9 @@ public class IndexModel : PageModel
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "Failed to read all members!");
+            ErrorMessage = "Noget gik galt ved at indhente alle spejdere, prøv igen senere";
         }
-    }
-
-
-    // OnPost for when clicking delete first time
-    public void OnPostAskDeletion(int id)
-    {
-        memberToDelete = id;
-
-        try
-        {
-            memberList = _scoutService.ReadAllMembers();
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = ex.Message;
-        }
-    }
-    
-    // OnPost for viewing a members memberDetails page
-    public void OnPostSeeMemberDetails(int id)
-    {
-        
     }
     
     // OnPost for cofirmation of deletion
@@ -70,11 +53,8 @@ public class IndexModel : PageModel
         }
         catch (KeyNotFoundException)
         {
+            _logger.LogWarning("Tried to delete member {MemberId}, but it was not found", id);
             ErrorMessage = "Spejderen findes ikke længere.";
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = ex.Message;
         }
 
         // Run same ReadAllMembers from OnGet, since page gets reloaded 
@@ -82,12 +62,16 @@ public class IndexModel : PageModel
         try
         {
             memberList = _scoutService.ReadAllMembers();
+            AllActivities = _activityService.GetAll();
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "Failed to read all members!");
+            
+            // "??" after ErrorMessage means "only assign if ErrorMessage is null"
+            ErrorMessage ??= "Data kunne ikke hentes. Prøv igen senere.";
         }
-
+        
         return Page();
     }
     
