@@ -111,12 +111,14 @@
         <span>@member.PhoneNumber</span>
         <span>@member.Username</span>
         <span>@(member.IsLeader ? "Leder" : "Spejder")</span>
-        <a >Delete</a>
+        
+        <a asp-page="/crud/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a>
         
         <form method="post" asp-page-handler="AskDeletion">
             <input type="hidden" name="id" value="@member.MemberId" />
             <button type="submit">Slet</button>
         </form>
+        
     </div>
 }
 <!-- end -->
