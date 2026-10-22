@@ -32,23 +32,9 @@ namespace ScoutWeb.Pages
                 {
                     return Page();
                 }
-
-                List<Claim> claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
-
-                    new Claim(ClaimTypes.Name, member.Username),
-
-                    new Claim(ClaimTypes.Role, member.IsLeader ? "Leader" : "Member")
-                };
-
-                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
-                // ASP.NET Core provides an asynchronous method.
-                // GetAwaiter().GetResult() lets us call it synchronously.
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal).GetAwaiter().GetResult();
+                
+                // If login is successful, create the authentication cookie
+                LoginAuth(member);
 
                 TempData["SuccessMessage"] = $"Velkommen, {member.GetFullName()}! Du er nu logget ind.";
                 return RedirectToPage("/Index");
@@ -69,6 +55,29 @@ namespace ScoutWeb.Pages
             [Required(ErrorMessage = "Adgangskode mangler")]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
+        }
+
+        public void LoginAuth(Member member)
+        {
+            // Create claims for the logged-in user, meaning the information we want to store in the cookie
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
+
+                new Claim(ClaimTypes.Name, member.Username),
+
+                new Claim(ClaimTypes.Role, member.IsLeader ? "Leader" : "Member")
+            };
+
+            // Create a ClaimsIdentity with the claims and the authentication scheme, which represents the user's identity
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Create a ClaimsPrincipal with the identity, which represents the logged-in user
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+            // ASP.NET Core provides an asynchronous method.
+            // GetAwaiter().GetResult() lets us call it synchronously.
+            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal).GetAwaiter().GetResult();
         }
     }
 }

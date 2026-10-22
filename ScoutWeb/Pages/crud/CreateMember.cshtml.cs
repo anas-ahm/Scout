@@ -4,6 +4,9 @@ using ScoutLibrary.Models;
 using ScoutLibrary.Service;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ScoutWeb.Pages.crud
 {
@@ -52,7 +55,9 @@ namespace ScoutWeb.Pages.crud
             try
             {
                 // _scoutService.CreateMember(memberToCreate);
-                _memberAuthService.Register(memberToCreate);
+                Member registeredMember = _memberAuthService.Register(memberToCreate);
+
+                AuthRegister(registeredMember);
             }
             catch (Exception ex)
             {
@@ -86,6 +91,30 @@ namespace ScoutWeb.Pages.crud
             public string Password { get; set; } = "";
 
             public bool IsLeader { get; set; }
+        }
+
+        public void AuthRegister(Member registeredMember)
+        {
+            // Create claims for the logged-in user, meaning the information we want to store in the cookie
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, registeredMember.MemberId.ToString()),
+
+                new Claim(ClaimTypes.Name, registeredMember.Username),
+
+                new Claim(ClaimTypes.Role, registeredMember.IsLeader ? "Leader" : "Member")
+            };
+
+            // Create a ClaimsIdentity with the claims and the authentication scheme, which represents the user's identity
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Create a ClaimsPrincipal with the identity, which represents the logged-in user
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+            // ASP.NET Core provides an asynchronous method.
+            // GetAwaiter().GetResult() lets us call it synchronously.
+            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,principal).GetAwaiter().GetResult();
+            // Auth cookie logic end
         }
     }
 }
