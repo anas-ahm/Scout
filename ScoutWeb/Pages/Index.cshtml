@@ -27,4 +27,12 @@
 <a asp-page="/crud/CreateMember">Opret Spejder</a>
 <!-- end -->
 
-<a asp-page="/Login">Log ind</a>
+<!-- Show login/logout links depending on whether the user is authenticated or not -->
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-page="/Logout">Log ud</a>
+}
+else
+{
+    <a asp-page="/Login">Log ind</a>
+}
