@@ -79,7 +79,7 @@ namespace ScoutWeb.Pages.crud
 
             TempData["SuccessMessage"] = $"{Input.FirstName} {Input.LastName} blev opdateret";
             
-            return RedirectToPage("/crud/UpdateMember");
+            return Redirect($"/crud/MemberDetails/{id}");
         }
 
         

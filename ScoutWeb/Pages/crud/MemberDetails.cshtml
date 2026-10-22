@@ -4,6 +4,15 @@
 @{
 }
 
+<!-- SuccesMessage after redirects-->
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="success-message" role="alert">
+        @successMessage
+    </div>
+}
+<!-- end -->
+
 <!-- Detail section for members -->
 @if (!Model.memberFound)
 {

@@ -2,14 +2,6 @@
 @model ScoutWeb.Pages.crud.UpdateMemberModel
 @using ScoutLibrary.Models
 
-<!-- SuccesMessage after redirects-->
-@if (TempData["SuccessMessage"] is string successMessage)
-{
-    <div class="success-message" role="alert">
-        @successMessage
-    </div>
-}
-<!-- end -->
 
 <!-- Update member form-->
 @if (Model.memberToUpdate != null)
@@ -55,6 +47,8 @@
         </div>
 
         <button type="submit">Update</button>
+        
+        <a asp-page="/Index">Fortryd</a>
     </form>
 }
 else
