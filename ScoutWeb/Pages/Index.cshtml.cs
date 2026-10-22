@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Org.BouncyCastle.Asn1.Mozilla;
 using ScoutLibrary.Models;
 using ScoutLibrary.Service;
 
@@ -91,5 +92,20 @@ public class IndexModel : PageModel
         return Page();
     }
     
+    public IActionResult OnPostDeleteActivity(int id)
+    {
+        try
+        {
+            _activityService.Delete(id);
+            TempData["SuccessMessage"] = "Aktiviteten blev slettet succesfuldt.";  //tempdata gemmes i én refresh
+            OnGet();
+            return RedirectToPage(); // Genindlæser siden
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, "Kunne ikke slette aktiviteten.");
+            return Page();
+        }
+    }
     
 }

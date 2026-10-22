@@ -93,9 +93,31 @@ namespace ScoutLibrary.Repositories
 
         }
 
-        public Activity Delete(int id)
+        public Activity Delete(int id) //skifter til Activity når GetById er lavet
         {
-            throw new NotImplementedException();
+            //Activity activityToDelete = GetById(id);
+            //if (activityToDelete == null)
+            //{
+            //    return null; // Eller kast en fejl, hvis den ikke findes
+            //}
+            try
+            {
+                using (MySqlConnection connection = _db.Connect2())
+                {
+                    string deleteQuery = "DELETE FROM activities WHERE activity_id = @activityId";
+                    using (MySqlCommand cmd = new MySqlCommand(deleteQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@activityId", id);
+                        cmd.ExecuteNonQuery();
+
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Noget gik galt under sletning i databasen", ex);
+            }
+            return null; //afleverer senere et rigtigt objekt
         }
 
         public List<Activity> GetAll()

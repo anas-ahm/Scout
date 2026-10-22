@@ -24,5 +24,10 @@ namespace ScoutLibrary.Service
         {
             return _activityRepository.GetAll();
         }
+
+        public Activity Delete(int id)
+        {
+            return _activityRepository.Delete(id);
+        }
     }
 }
