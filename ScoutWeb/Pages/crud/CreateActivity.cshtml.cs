@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ScoutLibrary.Repositories;
 using ScoutLibrary.Models;
-using Activity = ScoutLibrary.Models.Activity;
+using ScoutLibrary.Repositories;
 using ScoutLibrary.Service;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design.Serialization;
+using Activity = ScoutLibrary.Models.Activity;
 
 namespace ScoutWeb.Pages.crud
 {
@@ -24,10 +25,16 @@ namespace ScoutWeb.Pages.crud
         public int? MaxCount { get; set; }
         [BindProperty]
         public int? MinAge { get; set; }
+
+        //Til form select multiple skal bruges en liste, men den kan IKKE holde på hele objekter. Derfor bruges int ell. string.
         [BindProperty]
         public List<int>? SelectedBadges { get; set; } = new List<int>();
+
         [BindProperty]
+        [Required(ErrorMessage = "Du skal vælge mindst én leder til aktiviteten.")] //denne del sikrer at listen ikke må være null
+        [MinLength(1, ErrorMessage = "Du skal vælge mindst én leder til aktiviteten.")] //denne del sikrer at .count er minimum 1 
         public List<int> SelectedLeaders { get; set; } = new List<int>();
+
 
         // Denne liste bruges til at vise alle eksisterende badges og ledere i HTML-formularen
         public List<Badge>? AvailableBadges { get; set; } = new List<Badge>();
@@ -50,22 +57,26 @@ namespace ScoutWeb.Pages.crud
 
         public IActionResult OnPost()
         {
-            //betingelser gemmes INDEN man checker modelstate, for at blive kontrolleret og vist
-            if (SelectedLeaders == null || SelectedLeaders.Count == 0)
-            {
-                ModelState.AddModelError("SelectedLeaders", "Du skal vælge mindst én leder til aktiviteten.");
-            }
+            //Betingelse kan skrives her ELLER under [bindproperty], som jeg har gjort. Efterladt for at vise det.
+            //if (SelectedLeaders == null || SelectedLeaders.Count == 0)
+            //{
+            //    ModelState.AddModelError("SelectedLeaders", "Du skal vælge mindst én leder til aktiviteten.");
+            //}
 
+
+            // Håndterer brugerfejl (validering)
             if (!ModelState.IsValid)
             {
-                OnGet();
+                OnGet();  //Henter listerne igen så formularen ikke crasher.
                 return Page();
             }
-            //når onpost kører resettes listerne vi fyldte i OnGet, derfor henter vi igen
+
+            //når onpost kører resettes listerne vi fyldte i OnGet, derfor fylder vi listerne igen
             var allBadges = _badgeService.GetAll();
             var allLeaders = _memberService.ReadAllMembers().Where(m => m.IsLeader).ToList();
 
-            //Listen af valgte id'er som er bundet via BindModel bruges til at lave en liste af objekterne:
+
+            //SelectedIds, som er bundet via BindProperty, bruges her til at lave en liste af objekterne:
             var requiredBadges = allBadges
                                 .Where(b => SelectedBadges?.Contains(b.BadgeId) == true)
                                 .ToList();
@@ -92,7 +103,7 @@ namespace ScoutWeb.Pages.crud
                 TempData["SuccessMessage"] = "Aktivitet oprettet succesfuldt!";
                 return RedirectToPage("/Index");
             }
-            catch(Exception ex)
+            catch(Exception ex) //Håndterer tekniske systemfejl, kræver at der kastes en exception, da det ikke kan løses af brugeren.
             {
                 ModelState.AddModelError(string.Empty, "Kunne ikke gemme medarbejderen. Prøv venligst igen eller kontakt systemadministrator.");
                 throw new Exception("Fejl ved oprettelse af medarbejder i databasen", ex);

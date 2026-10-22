@@ -195,7 +195,7 @@ namespace ScoutLibrary.Repositories
             
         }
 
-		public Member GetByUsername(string username)
+		public Member? GetByUsername(string username)
 		{
 			const string query = """
             SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username, password FROM members
@@ -211,7 +211,7 @@ namespace ScoutLibrary.Repositories
 
             if (!reader.Read())
             {
-                throw new KeyNotFoundException($"Ingen spejder fundet med brugernavnet: \"{username}\".");
+                return null;
             }
 
             return new Member(

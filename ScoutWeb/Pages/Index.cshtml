@@ -65,6 +65,7 @@
             <th>Max Antal</th>
             <th>Min Alder</th>
             <th>Deltagere</th>
+            <th>Handling</th>
         </tr>
     </thead>
     <tbody>
@@ -91,24 +92,59 @@
                         <span class="text-muted">Ingen tilmeldte</span>
                     }
                 </td>
-                
-                @if (@Model.LoggedInMember != null)
-                {
-                    if (!Model.AssignedActivityIds.Contains(a.ActivityId))
+<!--EDIT DELETE BUTTONS FOR ACTIIVTY - LEADER ONLY***********************************************-->
+                <td>
+                    <div>
+                        <a asp-page="/crud/ActivityDetails" asp-route-id="@a.ActivityId" style="display:inline">
+                            Se mere
+                        </a>
+                    </div>
+
+                    <div>
+                        <a asp-page="/crud/UpdateActivity" asp-route-id="@a.ActivityId" style="display:inline">
+                            Rediger
+                        </a>
+                    </div>
+
+                    <!--MODAL popup med ren HTML!___________ #Invoker Command API HTML attributes-->
+                    <button type="button" command="show-modal" commandfor="delete-dialog-@a.ActivityId">
+                        Slet
+                    </button>
+                    <!-- 2. Selve dialogen med unikt ID -->
+                    <dialog id="delete-dialog-@a.ActivityId">
+                        <p>Vil du slette aktiviteten <strong>@a.Name</strong>?</p>
+
+                        <div>
+                            <!-- Fortryd-knap: Lukker dialogen igen uden at gøre noget -->
+                            <button type="button" command="close" commandfor="delete-dialog-@a.ActivityId">
+                                Fortryd
+                            </button>
+
+                            <!-- Bekræft-knap: Sender data til din C#-PageHandler med ID -->
+                            <form method="post" asp-page-handler="DeleteActivity" asp-route-id="@a.ActivityId" style="display:inline;">
+                                <button type="submit">Bekræft</button>
+                            </form>
+                        </div>
+                    </dialog>
+                    <!--MODAL popup med ren HTML slut__________________________________________-->
+
+                    <!-- Tilmeld / afmeld (din del fra AM) -->
+                    @if (Model.LoggedInMember != null)
                     {
-                        <form method="post" asp-page-handler="AssignActivity" asp-route-activityId="@a.ActivityId">
-                            <button type="submit">Tilmeld aktivitet</button>
-                        </form>
+                        if (!Model.AssignedActivityIds.Contains(a.ActivityId))
+                        {
+                            <form method="post" asp-page-handler="AssignActivity" asp-route-activityId="@a.ActivityId">
+                                <button type="submit">Tilmeld aktivitet</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId">
+                                <button type="submit">Afmeld aktivitet</button>
+                            </form>
+                        }
                     }
-                    else
-                    {
-                        <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId">
-                            <button type="submit">Afmeld aktivitet</button>
-                        </form>
-                    }
-                }
-                
-                
+                </td>
             </tr>
         }
     </tbody>
@@ -134,7 +170,7 @@ else
 
 <!-- List over all Scouts-->
 <h1>Medlemmer</h1>
-@foreach (Member member in @Model.memberList)
+@foreach (Member member in Model.memberList)
 {
     <div class="member">
         <span>@member.FirstName @member.LastName</span>

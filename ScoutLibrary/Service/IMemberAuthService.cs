@@ -4,7 +4,7 @@ namespace ScoutLibrary.Service;
 
 public interface IMemberAuthService
 {
-	public Member GetMemberByUsername(string username);
+	public Member? GetMemberByUsername(string username);
 
 	public Member Login(string username, string password);
 
