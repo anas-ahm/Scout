@@ -15,6 +15,7 @@ builder.Services.AddScoped<ICRUD<Badge>, BadgeRepository>();
 builder.Services.AddScoped<ScoutService>();
 builder.Services.AddScoped<IMemberAuth, MemberRepository>();
 builder.Services.AddScoped<IMemberAuthService, MemberAuthService>();
+builder.Services.AddScoped<IMemberActivity, MemberRepository>();
 builder.Services.AddTransient<ActivityService>();
 builder.Services.AddTransient<BadgeService>();
 

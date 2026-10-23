@@ -1,9 +1,10 @@
 ﻿using ScoutLibrary.Models;
 using MySqlConnector;
+using Org.BouncyCastle.Cms;
 
 namespace ScoutLibrary.Repositories
 {
-    public class MemberRepository : ICRUD<Member>, IMemberAuth
+    public class MemberRepository : ICRUD<Member>, IMemberAuth, IMemberActivity
     {
         private readonly DBWorker _db;
         
@@ -126,28 +127,39 @@ namespace ScoutLibrary.Repositories
         {
             try
             {
-                string sql = "SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members WHERE member_id = @member_id";
-
+                string sql = """
+                             SELECT members.member_id, members.first_name, members.last_name, members.date_of_birth,
+                                    members.phone_number, members.is_leader, members.username,
+                                    activity_members.activity_id
+                             FROM members
+                             LEFT JOIN activity_members ON members.member_id = activity_members.member_id
+                             WHERE members.member_id = @member_id
+                             """;
+                
                 using MySqlConnection connString = _db.Connect();
 
                 using MySqlCommand cmd = new MySqlCommand(sql, connString);
                 cmd.Parameters.AddWithValue("member_id", id);
 
                 using MySqlDataReader reader = cmd.ExecuteReader();
-                
-                if (!reader.Read())
-                {
-                    return null;
-                }
-                
+
                 Member memberToRead = new Member();
-                memberToRead.MemberId = reader.GetInt32("member_id");
-                memberToRead.FirstName = reader.GetString("first_name");
-                memberToRead.LastName = reader.GetString("last_name");
-                memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
-                memberToRead.PhoneNumber = reader.GetString("phone_number");
-                memberToRead.IsLeader = reader.GetBoolean("is_leader");
-                memberToRead.Username = reader.GetString("username");
+                
+                while (reader.Read())
+                {
+                    
+                    memberToRead.MemberId = reader.GetInt32("member_id");
+                    memberToRead.FirstName = reader.GetString("first_name");
+                    memberToRead.LastName = reader.GetString("last_name");
+                    memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
+                    memberToRead.PhoneNumber = reader.GetString("phone_number");
+                    memberToRead.IsLeader = reader.GetBoolean("is_leader");
+                    memberToRead.Username = reader.GetString("username");
+                    
+                    // Creating activity objects with correct id, and puts them in the objects activity list
+                    Activity activity = new Activity { ActivityId = reader.GetInt32("activity_id") };
+                    memberToRead.Activities.Add(activity);
+                }
                 
                 return memberToRead;
             }
@@ -194,6 +206,51 @@ namespace ScoutLibrary.Repositories
             }
             
         }
+
+        public void AssignActivityToMember(int memberID, int activityId)
+        {
+            try
+            {
+                string sql = """
+                             INSERT INTO activity_members (activity_id, member_id) VALUES (@activity_id, @member_id)
+                             """;
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+                cmd.Parameters.AddWithValue("activity_id", activityId);
+                cmd.Parameters.AddWithValue("member_id", memberID);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Something went wrong assigning activity to member: ", ex);
+            }
+        }
+        
+        
+        
+        public void UnAssignActivityToMember(int memberID, int activityId)
+        {
+            try
+            {
+                string sql = """
+                             DELETE FROM activity_members WHERE member_id = @member_id AND activity_id = @activity_id
+                             """;
+
+                using MySqlConnection connString = _db.Connect();
+
+                using MySqlCommand cmd = new MySqlCommand(sql, connString);
+                cmd.Parameters.AddWithValue("activity_id", activityId);
+                cmd.Parameters.AddWithValue("member_id", memberID);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Something went wrong unassigning activity to member: ", ex);
+            }
+        }
+
 
 		public Member? GetByUsername(string username)
 		{

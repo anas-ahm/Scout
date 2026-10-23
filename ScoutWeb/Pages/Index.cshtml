@@ -127,8 +127,7 @@
                         </div>
                     </dialog>
                     <!--MODAL popup med ren HTML slut__________________________________________-->
-
-                    <!-- Tilmeld / afmeld (din del fra AM) -->
+                    
                     @if (Model.LoggedInMember != null)
                     {
                         if (!Model.AssignedActivityIds.Contains(a.ActivityId))
@@ -139,8 +138,8 @@
                         }
                         else
                         {
-                            <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId">
-                                <button type="submit">Afmeld aktivitet</button>
+                            <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId" onsubmit="return confirm('Er du sikker på, at du vil afmelde denne aktivitet?');">
+                                <button type="submit" >Afmeld aktivitet</button>
                             </form>
                         }
                     }

@@ -42,18 +42,8 @@ public class IndexModel : PageModel
     // Runs when page is loaded
     public void OnGet()
     {
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-            int id = int.Parse(userId);
-
-            LoggedInMember = _memberRepository.GetById(id);
-
-            // LINQ Select that goes through all the logged in members Activities, selects the id's
-            // and puts them into AssignedActivityIds
-            AssignedActivityIds = LoggedInMember.Activities.Select(x => x.ActivityId).ToList();        
-        }
+        // moved to a void method
+        LoadLoggedInMember();
 
         try
         {
@@ -94,7 +84,7 @@ public class IndexModel : PageModel
             _logger.LogError(ex, "Failed to read all members!");
             
             // "??" after ErrorMessage means "only assign if ErrorMessage is null"
-            ErrorMessage ??= "Data kunne ikke hentes. Prøv igen senere.";
+            TempData["ErrorMessage"] = "Data kunne ikke hentes. Prøv igen senere.";
         }
         
         return Page();
@@ -122,14 +112,65 @@ public class IndexModel : PageModel
     // OnPost for signing up for an activity
     public IActionResult OnPostAssignActivity(int activityId)
     {
+        try
+        {
+            LoadLoggedInMember();
+
+            //adding activity to LoggedInMember 
+            LoggedInMember.Activities.Add(_activityService.GetById(activityId));
+          
+            _scoutService.AssignActivityToMember(LoggedInMember.MemberId, activityId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Couldn't assign activity to member");
+            TempData["ErrorMessage"] = "Kan ikke tilføje aktivitet, Prøv igen senere.";
+            
+        }
+
+        TempData["SuccessMessage"] = "Du er nu tilmeldt!";
         return RedirectToPage();
     }
     
     
     // OnPost for Unassigning up for an activity
-    public IActionResult OnPostUnAssignActivity()
+    public IActionResult OnPostUnAssignActivity(int activityId)
     {
+        try
+        {
+            LoadLoggedInMember();
+
+            //removing activity to LoggedInMember 
+            LoggedInMember.Activities.Remove(_activityService.GetById(activityId));
+          
+            _scoutService.UnAssignActivityToMember(LoggedInMember.MemberId, activityId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Couldn't assign activity to member");
+            TempData["ErrorMessage"] = "Kan ikke fjerne aktivitet, Prøv igen senere.";
+            
+        }
+
+        TempData["SuccessMessage"] = "Du er nu afmeldt!";
         return RedirectToPage();
+    }
+
+    // Loads the logged-in member and the assigned activity id's - 
+    private void LoadLoggedInMember()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            int id = int.Parse(userId);
+
+            LoggedInMember = _memberRepository.GetById(id);
+
+            // LINQ Select that goes through all the logged in members Activities, selects the id's
+            // and puts them into AssignedActivityIds
+            AssignedActivityIds = LoggedInMember.Activities.Select(x => x.ActivityId).ToList();        
+        }
     }
     
 }
