@@ -118,17 +118,33 @@ public class IndexModel : PageModel
 
             //adding activity to LoggedInMember 
             LoggedInMember.Activities.Add(_activityService.GetById(activityId));
-          
+
             _scoutService.AssignActivityToMember(LoggedInMember.MemberId, activityId);
+
+            TempData["SuccessMessage"] = "Du er nu tilmeldt!";
         }
+        
+        // Catches exceptions from service layer ad puts it into tempdata
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Member or activity not found when assigning activity {ActivityId}", activityId);
+            TempData["ErrorMessage"] = ex.Message;
+        }
+        
+        // Catches exceptions from service layer ad puts it into tempdata
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+        
+        // Generic exception if something else thats not defined goes wrong.
         catch (Exception ex)
         {
             _logger.LogError(ex, "Couldn't assign activity to member");
             TempData["ErrorMessage"] = "Kan ikke tilføje aktivitet, Prøv igen senere.";
-            
+
         }
 
-        TempData["SuccessMessage"] = "Du er nu tilmeldt!";
         return RedirectToPage();
     }
     
