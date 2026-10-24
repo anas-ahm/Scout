@@ -30,6 +30,8 @@ public class IndexModel : PageModel
     // ILogger used to log exceptions in production code for us (devs) inside terminal
     // Users only see a generic error code
     private readonly ILogger<IndexModel> _logger;
+    [BindProperty(SupportsGet =true)]
+    public string? SearchQuery { get; set; }
 
     public IndexModel(ScoutService scoutService, ActivityService activityService, ICRUD<Member> memberRepository, ILogger<IndexModel> logger)
     {
@@ -47,8 +49,28 @@ public class IndexModel : PageModel
 
         try
         {
-            memberList = _scoutService.ReadAllMembers();
-            AllActivities = _activityService.GetAll();
+            List<Activity> allActivities = _activityService.GetAll();
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                AllActivities = allActivities;
+            }
+            else
+            {
+                // Check om søgeordet er et tal (søgning efter alder)
+                bool isNumeric = int.TryParse(SearchQuery, out int searchedAge);
+
+                AllActivities = allActivities.Where(a =>
+                    
+                    (a.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) //filtrerer efter navn
+                    ||                   
+                    (isNumeric && a.MinAge.HasValue && a.MinAge.Value == searchedAge) //filterer efter alder (kun hvis det er et tal)
+                    ||
+                    (a.RequiredBadges != null && a.RequiredBadges.Any(b => b.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))) // Filtrerer efter tilknyttede badges
+                ).ToList();
+            }
+            
+            memberList = _scoutService.ReadAllMembers();  
         }
         catch (Exception ex)
         {

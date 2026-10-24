@@ -54,7 +54,11 @@
 <!-- end -->
 
 
-
+<form method="get">
+    <label asp-for="SearchQuery">Søg:</label>
+    <input asp-for="SearchQuery" placeholder="Indtast navn, spejdertegn, alder ..." />
+    <button type="submit">Søg</button>
+</form>
 <!--Liste oversigt over alle aktiviter-->
 <h1>Aktiviteter</h1>
 <table class="table">
