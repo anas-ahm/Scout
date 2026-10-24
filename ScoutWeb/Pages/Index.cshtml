@@ -76,11 +76,8 @@
             @foreach (Activity a in Model.AllActivities)
             {
                 <tr>
-                    <!-- Split DateTime into Date and Time -->
                     <td>@a.DateTime.ToString("yyyy-MM-dd")</td>
                     <td>@a.DateTime.ToString("HH:mm")</td>
-
-                    <!-- Activity properties -->
                     <td>@a.Name</td>
                     <td>@a.MaxCount</td>
                     <td>@a.MinAge</td>
@@ -178,7 +175,42 @@ else
 <!-- List over all Scouts-->
 
     <h1>Medlemmer</h1>
-    @foreach (Member member in Model.memberList)
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Fødselsdato</th>
+                <th>Telefon</th>
+                <th>Brugernavn</th>
+                <th>Rolle</th>
+                <th>Handling</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Member member in Model.memberList)
+            {
+                <tr>
+                    <td>@member.FirstName @member.LastName</td>
+                    <td>@member.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                    <td>@member.PhoneNumber</td>
+                    <td>@member.Username</td>
+                    <td>@(member.IsLeader ? "Leder" : "Spejder")</td>
+                    <td>
+                        <!-- Handlinger samlet i én kolonne -->
+                        <div><a asp-page="/crud/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a></div> 
+                        <div><a asp-page="/crud/UpdateMember" asp-route-id="@member.MemberId">Rediger</a></div>
+
+                        <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId"
+                              onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
+                            <button type="submit">Slet</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+ @*    @foreach (Member member in Model.memberList)
     {
         <div class="member">
             <span>@member.FirstName @member.LastName</span>
@@ -197,7 +229,7 @@ else
             <a asp-page="/crud/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
         
         </div>
-    }
+    } *@
 </div>
 <!-- end -->
 
