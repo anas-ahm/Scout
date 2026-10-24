@@ -32,6 +32,8 @@ public class IndexModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     [BindProperty(SupportsGet =true)]
     public string? SearchQuery { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public string? SearchMember { get; set; }
 
     public IndexModel(ScoutService scoutService, ActivityService activityService, ICRUD<Member> memberRepository, ILogger<IndexModel> logger)
     {
@@ -69,8 +71,23 @@ public class IndexModel : PageModel
                     (a.RequiredBadges != null && a.RequiredBadges.Any(b => b.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))) // Filtrerer efter tilknyttede badges
                 ).ToList();
             }
-            
-            memberList = _scoutService.ReadAllMembers();  
+
+            List<Member> allMembers = _scoutService.ReadAllMembers();
+
+            if (string.IsNullOrEmpty(SearchMember))
+            {
+                memberList = allMembers;
+            }
+            else
+            {
+                memberList = allMembers.Where(m =>
+                (m.FirstName.Contains(SearchMember, StringComparison.OrdinalIgnoreCase))  //søg efter navn
+                ||
+                (m.PhoneNumber != null && m.PhoneNumber.Contains(SearchMember))            //søg efter tlf
+                ||
+                (m.Badges!=null && m.Badges.Any(b => b.Name.Contains(SearchMember, StringComparison.OrdinalIgnoreCase))) //filtrerer efter badge
+                ).ToList();
+            }
         }
         catch (Exception ex)
         {
