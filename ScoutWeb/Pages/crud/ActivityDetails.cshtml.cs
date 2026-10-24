@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScoutLibrary.Models;
 using ScoutLibrary.Service;
@@ -13,8 +14,14 @@ public class ActivityDetailsModel : PageModel
     {
         _activityService = activityService;
     }
-    public void OnGet(int id)
+    public IActionResult OnGet(int id)
     {
+        if (_activityService.GetById(id) == null)
+        {
+            TempData["ErrorMessage"] = "Aktivitet ikke fundet - prøv igen";
+            return RedirectToPage("Index");
+        }
         activity = _activityService.GetById(id);
+        return Page();
     }
 }

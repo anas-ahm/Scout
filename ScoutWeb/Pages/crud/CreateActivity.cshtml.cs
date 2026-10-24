@@ -105,8 +105,9 @@ namespace ScoutWeb.Pages.crud
             }
             catch(Exception ex) //Håndterer tekniske systemfejl, kræver at der kastes en exception, da det ikke kan løses af brugeren.
             {
-                ModelState.AddModelError(string.Empty, "Kunne ikke gemme medarbejderen. Prøv venligst igen eller kontakt systemadministrator.");
-                throw new Exception("Fejl ved oprettelse af medarbejder i databasen", ex);
+                ModelState.AddModelError(string.Empty, "Kunne ikke gemme aktiviteten. Prøv venligst igen eller kontakt systemadministrator.");
+                OnGet();
+                return Page();
             }
         }
     }
