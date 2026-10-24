@@ -6,50 +6,71 @@
 <!-- Update member form-->
 @if (Model.memberToUpdate != null)
 {
-    <form method="post" asp-page-handler="UpdateMember">
+    if (Model.memberToUpdate.IsLeader)
+    {
+        <form method="post" asp-page-handler="LeaderUpdateMember">
         
-        <div asp-validation-summary="All" class="error-message"></div>
+            <div asp-validation-summary="All" class="error-message"></div>
         
-        <div>
-            <label asp-for="Input.FirstName">Fornavn</label>
-            <input asp-for="Input.FirstName" value="@Model.memberToUpdate.FirstName"/>
-            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.FirstName">Fornavn</label>
+                <input asp-for="LeaderInput.FirstName" value="@Model.memberToUpdate.FirstName"/>
+                <span asp-validation-for="LeaderInput.FirstName" class="text-danger"></span>
+            </div>
 
-        <div>
-            <label asp-for="Input.LastName">Efternavn</label>
-            <input asp-for="Input.LastName" value="@Model.memberToUpdate.LastName"></input>
-            <span asp-validation-for="Input.LastName" class="text-danger"></span>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.LastName">Efternavn</label>
+                <input asp-for="LeaderInput.LastName" value="@Model.memberToUpdate.LastName"></input>
+                <span asp-validation-for="LeaderInput.LastName" class="text-danger"></span>
+            </div>
 
-        <div>
-            <label asp-for="Input.DateOfBirth"></label>
-            <input asp-for="Input.DateOfBirth" type="date" value="@Model.memberToUpdate.DateOfBirth"/>
-            <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.DateOfBirth"></label>
+                <input asp-for="LeaderInput.DateOfBirth" type="date" value="@Model.memberToUpdate.DateOfBirth"/>
+                <span asp-validation-for="LeaderInput.DateOfBirth" class="text-danger"></span>
+            </div>
 
-        <div>
-            <label asp-for="Input.PhoneNumber"></label>
-            <input asp-for="Input.PhoneNumber" value="@Model.memberToUpdate.PhoneNumber"/>
-            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.PhoneNumber"></label>
+                <input asp-for="LeaderInput.PhoneNumber" value="@Model.memberToUpdate.PhoneNumber"/>
+                <span asp-validation-for="LeaderInput.PhoneNumber" class="text-danger"></span>
+            </div>
 
-        <div>
-            <label asp-for="Input.Username"></label>
-            <input asp-for="Input.Username" value="@Model.memberToUpdate.Username"/>
-            <span asp-validation-for="Input.Username" class="text-danger"></span>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.Username"></label>
+                <input asp-for="LeaderInput.Username" value="@Model.memberToUpdate.Username"/>
+                <span asp-validation-for="LeaderInput.Username" class="text-danger"></span>
+            </div>
 
 
-        <div>
-            <label asp-for="Input.IsLeader"></label>
-            <input asp-for="Input.IsLeader" type="checkbox" value="@Model.memberToUpdate.IsLeader"/>
-        </div>
+            <div>
+                <label asp-for="LeaderInput.IsLeader"></label>
+                <input asp-for="LeaderInput.IsLeader" type="checkbox" value="@Model.memberToUpdate.IsLeader"/>
+            </div>
 
-        <button type="submit">Update</button>
+            <button type="submit">Update</button>
         
-        <a asp-page="/Index">Fortryd</a>
-    </form>
+            <a asp-page="/Index">Fortryd</a>
+        </form>
+    }
+    else if (!Model.memberToUpdate.IsLeader)
+    {
+        <form method="post" asp-page-handler="ScoutUpdateMember">
+            
+            <div asp-validation-summary="All" class="error-message"></div>
+
+            <div>
+                <label asp-for="ScoutInput.PhoneNumber"></label>
+                <input asp-for="ScoutInput.PhoneNumber" value="@Model.memberToUpdate.PhoneNumber"/>
+                <span asp-validation-for="ScoutInput.PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <button type="submit">Updater</button>
+
+            <a asp-page="/Index">Fortryd</a>
+        </form>
+    }
+    
 }
 else
 {

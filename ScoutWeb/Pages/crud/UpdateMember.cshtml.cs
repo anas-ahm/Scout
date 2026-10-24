@@ -21,8 +21,8 @@ namespace ScoutWeb.Pages.crud
         public Member? memberToUpdate { get; set; }
         public bool memberFound { get; set; }
         
-        [BindProperty] 
-        public InputModel Input { get; set; } = new();
+        public LeaderInputModel LeaderInput { get; set; } = new();
+        public ScoutInputModel ScoutInput { get; set; } = new();
         
         
         public IActionResult OnGet(int id)
@@ -35,18 +35,17 @@ namespace ScoutWeb.Pages.crud
                 return RedirectToPage("/crud/MemberDetails");
             }
             
+            ScoutInput = new ScoutInputModel
+            {
+                PhoneNumber = memberToUpdate.PhoneNumber
+            };
+
             memberFound = true;
             return Page();
         }
 
-        public IActionResult OnPostUpdateMember(int id)
+        public IActionResult OnPostLeaderUpdateMember(int id, [Bind(Prefix = nameof(LeaderInput))] LeaderInputModel input)
         {
-            // Only check digits if a value was actually provided ([Required] reports the missing case)
-            if (!string.IsNullOrEmpty(Input.PhoneNumber) && !Input.PhoneNumber.All(char.IsDigit))
-            {
-                ModelState.AddModelError("Input.PhoneNumber", "Telefonnummer må kun indeholde tal");
-            }
-            
             // Now this sees the error above as well as the attribute errors
             if (!ModelState.IsValid)
             {
@@ -58,12 +57,12 @@ namespace ScoutWeb.Pages.crud
             // Building the object and pass it though the repo
             Member memberToCreate = new Member();
             memberToCreate.MemberId = id;
-            memberToCreate.FirstName = Input.FirstName;
-            memberToCreate.LastName = Input.LastName;
-            memberToCreate.DateOfBirth = Input.DateOfBirth;
-            memberToCreate.PhoneNumber = Input.PhoneNumber;
-            memberToCreate.IsLeader = Input.IsLeader;
-            memberToCreate.Username = Input.Username;
+            memberToCreate.FirstName = input.FirstName;
+            memberToCreate.LastName = input.LastName;
+            memberToCreate.DateOfBirth = input.DateOfBirth;
+            memberToCreate.PhoneNumber = input.PhoneNumber;
+            memberToCreate.IsLeader = input.IsLeader;
+            memberToCreate.Username = input.Username;
             try
             {
                 _scoutService.Update(memberToCreate, id);
@@ -77,13 +76,70 @@ namespace ScoutWeb.Pages.crud
                 return Page();
             }
 
-            TempData["SuccessMessage"] = $"{Input.FirstName} {Input.LastName} blev opdateret";
+            TempData["SuccessMessage"] = $"{LeaderInput.FirstName} {LeaderInput.LastName} blev opdateret";
             
             return Redirect($"/crud/MemberDetails/{id}");
         }
 
+        public IActionResult OnPostScoutUpdateMember(int id, [Bind(Prefix = nameof(ScoutInput))] ScoutInputModel input)
+        {
+            // memberToUpdate is loaded again after OnPost Call
+            memberToUpdate = _scoutService.GetById(id);
+            if (memberToUpdate == null)
+            {
+                TempData["ErrorMessage"] = "Spejderen blev ikke fundet!";
+                return RedirectToPage("/Index");
+            }
+            
+            // Now this sees the error above as well as the attribute errors
+            if (!ModelState.IsValid)
+            {
+                // get member again before return call, so its not null and server crashes
+                memberToUpdate = _scoutService.GetById(id);
+                return Page();
+            }
+            
+            
+            // Building the object and pass it though the repo
+            Member memberToCreate = new Member();
+            memberToCreate.MemberId = id;
+            memberToCreate.FirstName = memberToUpdate.FirstName;
+            memberToCreate.LastName = memberToUpdate.LastName;
+            memberToCreate.DateOfBirth = memberToUpdate.DateOfBirth;
+            memberToCreate.PhoneNumber = input.PhoneNumber;
+            memberToCreate.IsLeader = memberToUpdate.IsLeader;
+            memberToCreate.Username = memberToUpdate.Username;
+            
+            try
+            {
+                _scoutService.Update(memberToCreate, id);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                
+                // get member again before return call, so its not null and server crashes
+                memberToUpdate = _scoutService.GetById(id);
+                return Page();
+            }
+
+            TempData["SuccessMessage"] = $"{memberToUpdate.FirstName} {memberToUpdate.LastName} blev opdateret";
+            
+            return Redirect($"/crud/MemberDetails/{id}");
+            
+        }
+
         
-        public class InputModel
+        public class ScoutInputModel
+        {
+            
+            [Required(ErrorMessage = "Telefonnummer mangler")]
+            [RegularExpression(@"^\d{8}$", ErrorMessage = "Telefonnummer skal være præcis 8 tal")]
+            public string PhoneNumber { get; set; } = "";
+         
+        }
+        
+        public class LeaderInputModel
         {
             [Required(ErrorMessage = "Fornavn mangler")]
             public string FirstName { get; set; } = "";
@@ -93,11 +149,11 @@ namespace ScoutWeb.Pages.crud
             
             [Required(ErrorMessage = "Fødselsdato mangler")]
             public DateTime DateOfBirth { get; set; }
-
+            
             [Required(ErrorMessage = "Telefonnummer mangler")]
-            [StringLength(8, MinimumLength = 8, ErrorMessage = "Telefonnummer skal være 8 tegn")]
+            [RegularExpression(@"^\d{8}$", ErrorMessage = "Telefonnummer skal være præcis 8 tal")]
             public string PhoneNumber { get; set; } = "";
-
+            
             [Required(ErrorMessage = "Brugernavn mangler")]
             public string Username { get; set; } = "";
             public bool IsLeader { get; set; }

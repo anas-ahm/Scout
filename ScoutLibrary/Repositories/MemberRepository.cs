@@ -117,7 +117,8 @@ namespace ScoutLibrary.Repositories
             // remaining exceptions
             catch(Exception ex)
             {
-                throw new Exception("Der opstod en fejl, da du prøvede at oprette en spejder!", ex);
+                Console.WriteLine(ex);   // temporary: prints the full exception chain to the console
+                throw new Exception("Der opstod en fejl, da du prøvede at opdater en spejder!", ex);
             }
             
             return member;
@@ -143,22 +144,29 @@ namespace ScoutLibrary.Repositories
 
                 using MySqlDataReader reader = cmd.ExecuteReader();
 
-                Member memberToRead = new Member();
+                Member? memberToRead = null;
                 
                 while (reader.Read())
                 {
+
+                    // only build the member once before loopting through activities
+                    if (memberToRead is null)
+                    {
+                        memberToRead = new Member();
+                        memberToRead.MemberId = reader.GetInt32("member_id");
+                        memberToRead.FirstName = reader.GetString("first_name");
+                        memberToRead.LastName = reader.GetString("last_name");
+                        memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
+                        memberToRead.PhoneNumber = reader.GetString("phone_number");
+                        memberToRead.IsLeader = reader.GetBoolean("is_leader");
+                        memberToRead.Username = reader.GetString("username");
+                    }
                     
-                    memberToRead.MemberId = reader.GetInt32("member_id");
-                    memberToRead.FirstName = reader.GetString("first_name");
-                    memberToRead.LastName = reader.GetString("last_name");
-                    memberToRead.DateOfBirth = reader.GetDateTime("date_of_birth");
-                    memberToRead.PhoneNumber = reader.GetString("phone_number");
-                    memberToRead.IsLeader = reader.GetBoolean("is_leader");
-                    memberToRead.Username = reader.GetString("username");
-                    
-                    // Creating activity objects with correct id, and puts them in the objects activity list
-                    Activity activity = new Activity { ActivityId = reader.GetInt32("activity_id") };
-                    memberToRead.Activities.Add(activity);
+                    // activity_id is NULL when the member has no activities (LEFT JOIN)
+                    if (!reader.IsDBNull(reader.GetOrdinal("activity_id")))
+                    {
+                        memberToRead.Activities.Add(new Activity { ActivityId = reader.GetInt32("activity_id") });
+                    }
                 }
                 
                 return memberToRead;
