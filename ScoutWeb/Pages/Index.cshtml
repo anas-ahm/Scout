@@ -42,6 +42,7 @@
     @if (Model.LoggedInMember != null)
     {
         <a asp-page="/crud/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
+        <a asp-page="/crud/UpdateMember" asp-route-id="@Model.LoggedInMember.MemberId">Rediger mine oplysninger</a>
     }
 </div>
 <!-- end -->
