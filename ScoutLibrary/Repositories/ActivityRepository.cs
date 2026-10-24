@@ -23,132 +23,113 @@ namespace ScoutLibrary.Repositories
 
         public Activity Create(Activity item)
         {
-            using (MySqlConnection connection = _db.Connect2())
+            using MySqlConnection connection = _db.Connect2();
+            using MySqlTransaction transaction = connection.BeginTransaction();
+            try
             {
-                using (MySqlTransaction transaction = connection.BeginTransaction())
+                string query = "INSERT INTO activities (name, date_time, description, max_count, min_age) VALUES(@name, @date_time, @description, @max_count, @min_age)";
+                using MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
+                
+                cmd.Parameters.AddWithValue("@name", item.Name);
+                cmd.Parameters.AddWithValue("@date_time", item.DateTime);
+                cmd.Parameters.AddWithValue("@description", (object)item.Description??DBNull.Value);  //property skal castes til object, således datatypen i property er samme type som DBNull, som ska lsendes til databasen hvis en værdi er null
+                cmd.Parameters.AddWithValue("@max_count", (object)item.MaxCount??DBNull.Value);
+                cmd.Parameters.AddWithValue("@min_age", (object)item.MinAge??DBNull.Value);
+                cmd.ExecuteNonQuery();
+
+                // Få det nye ID som databasen netop har genereret (AUTO_INCREMENT)
+                item.ActivityId = (int)cmd.LastInsertedId;
+
+
+                //indsæt badge tilknytning. Vi bruger cmd.CommantText for at genbruge samme MySqlCommand med ny query string
+                if (item.RequiredBadges != null && item.RequiredBadges.Count > 0)
                 {
-                    try
+                    cmd.CommandText = "INSERT INTO required_activity_badges (activity_id, badge_id) VALUES (@activity_id, @badge_id)";
+                    foreach (Badge badge in item.RequiredBadges)
                     {
-                        long newActivityId = 0;
-
-                        string query = "INSERT INTO activities (name, date_time, description, max_count, min_age) VALUES(@name, @date_time, @description, @max_count, @min_age)";
-                        using (MySqlCommand cmd = new MySqlCommand(query, connection, transaction))
-                        {
-                            cmd.Parameters.AddWithValue("@name", item.Name);
-                            cmd.Parameters.AddWithValue("@date_time", item.DateTime);
-                            cmd.Parameters.AddWithValue("@description", (object)item.Description??DBNull.Value);  //property skal castes til object, således datatypen i property er samme type som DBNull, som ska lsendes til databasen hvis en værdi er null
-                            cmd.Parameters.AddWithValue("@max_count", (object)item.MaxCount??DBNull.Value);
-                            cmd.Parameters.AddWithValue("@min_age", (object)item.MinAge??DBNull.Value);
-                            cmd.ExecuteNonQuery();
-
-
-
-                            // Få det nye ID som databasen netop har genereret (AUTO_INCREMENT)
-                            newActivityId = cmd.LastInsertedId;
-                            item.ActivityId = (int)newActivityId;
-                        }
-
-
-                        //indsætter tilknyttede badges til junction tabellen required_activitybadges
-                        string requiredActivityBadgesQuery = "INSERT INTO required_activity_badges (activity_id, badge_id) VALUES (@activity_id, @badge_id)";
-                        using (MySqlCommand cmdBadge = new MySqlCommand(requiredActivityBadgesQuery, connection, transaction))
-                        {
-                            if (item.RequiredBadges != null && item.RequiredBadges.Count > 0)
-                            {
-                                foreach (Badge badge in item.RequiredBadges)
-                                {
-                                    cmdBadge.Parameters.Clear();
-                                    cmdBadge.Parameters.AddWithValue("@activity_id", item.ActivityId);
-                                    cmdBadge.Parameters.AddWithValue("@badge_id", badge.BadgeId); // Kun ID'et!
-                                    cmdBadge.ExecuteNonQuery();
-                                }
-                            }
-                        }
-                     
-                        //indsætter tilknyttede ledere til junction tabellen activity_members
-                        string activityMembersQuery = "INSERT INTO activity_members (activity_id, member_id) VALUES (@activity_id, @member_id)";
-                        using (MySqlCommand memberCmd = new MySqlCommand(activityMembersQuery, connection, transaction))
-                        {
-                            if (item.Members != null && item.Members.Count > 0)
-                            {
-                                foreach (Member m in item.Members)
-                                {
-                                    memberCmd.Parameters.Clear();
-                                    memberCmd.Parameters.AddWithValue("@activity_id", item.ActivityId);
-                                    memberCmd.Parameters.AddWithValue("@member_id", m.MemberId); 
-                                    memberCmd.ExecuteNonQuery();
-                                }
-                            }
-                        }
-
-                        transaction.Commit();
-                        return item;
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        throw new Exception("Der opstod en fejl ved indsættelse i databasen. Prøv igen eller kontakt systemadmin" + ex.Message,ex);
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.AddWithValue("@activity_id", item.ActivityId);
+                        cmd.Parameters.AddWithValue("@badge_id", badge.BadgeId); // Kun ID'et!
+                        cmd.ExecuteNonQuery();
                     }
                 }
-                    
-            }
 
+                //Indæt ledertilknytning
+                if (item.Members != null && item.Members.Count > 0)
+                {
+                    cmd.CommandText = "INSERT INTO activity_members (activity_id, member_id) VALUES (@activity_id, @member_id)";
+                    foreach (Member m in item.Members)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.AddWithValue("@activity_id", item.ActivityId);
+                        cmd.Parameters.AddWithValue("@member_id", m.MemberId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                transaction.Commit();
+                return item;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Der opstod en fejl ved indsættelse i databasen. Prøv igen eller kontakt systemadmin" + ex.Message,ex);
+            }
         }
 
         public Activity Delete(int id) 
         {
-            //Activity activityToDelete = GetById(id);
-            //if (activityToDelete == null)
-            //{
-            //    return null; // Eller kast en fejl, hvis den ikke findes
-            //}
+            Activity activityToDelete = GetById(id);
+            if (activityToDelete == null)
+            {
+                return null; // Eller kast en fejl, hvis den ikke findes
+            }
             try
             {
-                using (MySqlConnection connection = _db.Connect2())
-                {
-                    string deleteQuery = "DELETE FROM activities WHERE activity_id = @activityId";
-                    using (MySqlCommand cmd = new MySqlCommand(deleteQuery, connection))
-                    {
-                        cmd.Parameters.AddWithValue("@activityId", id);
-                        cmd.ExecuteNonQuery();
-
-                    }
-                }
+                using MySqlConnection connection = _db.Connect2();
+                string deleteQuery = "DELETE FROM activities WHERE activity_id = @activityId";
+                using MySqlCommand cmd = new MySqlCommand(deleteQuery, connection);
+                cmd.Parameters.AddWithValue("@activityId", id);
+                cmd.ExecuteNonQuery();
+            
             }
             catch(Exception ex)
             {
                 throw new Exception("Noget gik galt under sletning i databasen", ex);
             }
-            return null; //afleverer senere et rigtigt objekt
+            return activityToDelete; 
         }
 
         public List<Activity> GetAll()
         {
-            //Dictionary: holder styr på unikke aktiviteter baseret på ID. Nødvendig pga LEFT JOIN
-            Dictionary<int, Activity> activityDictionary = new Dictionary<int, Activity>();
-            
-            using (MySqlConnection connection = _db.Connect2())
+            try
             {
+                //Dictionary: holder styr på unikke aktiviteter baseret på ID. Nødvendig pga LEFT JOIN
+                Dictionary<int, Activity> activityDictionary = new Dictionary<int, Activity>();
+
+                using MySqlConnection connection = _db.Connect2();
+
                 string activitiesQuery = """
-                    SELECT a.activity_id, a.date_time, a.description AS activity_description, a.max_count, a.min_age, a.name AS activity_name,                                    
-                           ab.badge_id,                                    
-                           b.name AS badge_name, b.description AS badge_description,                                   
-                           am.member_id,
-                           m.first_name, m.last_name, m.date_of_birth, m.phone_number, m.is_leader, m.username
-                    FROM activities a 
-                    LEFT JOIN activity_members am ON a.activity_id = am.activity_id
-                    LEFT JOIN members m ON am.member_id = m.member_id
-                    LEFT JOIN required_activity_badges ab ON a.activity_id = ab.activity_id
-                    LEFT JOIN badges b ON ab.badge_id = b.badge_id                 
-                    """;
+                SELECT a.activity_id, a.date_time, a.description AS activity_description, a.max_count, a.min_age, a.name AS activity_name,                                    
+                        ab.badge_id,                                    
+                        b.name AS badge_name, b.description AS badge_description,                                   
+                        am.member_id,
+                        m.first_name, m.last_name, m.date_of_birth, m.phone_number, m.is_leader, m.username
+                FROM activities a 
+                LEFT JOIN activity_members am ON a.activity_id = am.activity_id
+                LEFT JOIN members m ON am.member_id = m.member_id
+                LEFT JOIN required_activity_badges ab ON a.activity_id = ab.activity_id
+                LEFT JOIN badges b ON ab.badge_id = b.badge_id                 
+                """;
                 using MySqlCommand activitiesCmd = new MySqlCommand(activitiesQuery, connection);
                 using MySqlDataReader reader = activitiesCmd.ExecuteReader();
 
 
                 while (reader.Read())
                 {
-                    //Hent activity_id fra databasen (key-value!), check i ordbogen for at se om aktiviteten allerede eksisterer. Gør den ikke, laves en Activity
+                    //Hent activity_id fra databasen (key-value!), 
                     int activityId = reader.GetInt32("activity_id");
+
+                    //check i ordbogen for at se om aktiviteten allerede eksisterer.Gør den ikke, laves en Activity
                     if (!activityDictionary.ContainsKey(activityId))
                     {
                         Activity a = new Activity
@@ -167,20 +148,13 @@ namespace ScoutLibrary.Repositories
                             Members = new List<Member>()
 
                         };
-
-
                         activityDictionary.Add(activityId, a);
                     }
+                    Activity currentActivity = activityDictionary[activityId]; //hent den nuværende aktivitet for at tilføje badges og ledere:
 
-                    //hent den nuværende aktivitet for at tilføje badges og ledere:
-                    Activity currentActivity = activityDictionary[activityId];
-
-
-                    //check først for null værdier (kanopstå pga left join
-                    if (!reader.IsDBNull(reader.GetOrdinal("badge_id")))
+                    if (!reader.IsDBNull(reader.GetOrdinal("badge_id")))    //check først for null værdier (kanopstå pga left join
                     {
-                        //læs herefter værdiern for badge_id
-                        int badgeId = reader.GetInt32("badge_id");
+                        int badgeId = reader.GetInt32("badge_id");      //læs herefter værdiern for badge_id
 
                         //check om den aktivitet, vi er igang med at oprette, allerede har det badge! igen, nødvendigt pga mange left joins
                         if (!currentActivity.RequiredBadges.Any(b => b.BadgeId == badgeId))
@@ -191,11 +165,8 @@ namespace ScoutLibrary.Repositories
                                 Name = reader.GetString("badge_name"),
                                 Description = reader.IsDBNull(reader.GetOrdinal("badge_description")) ? null : reader.GetString("badge_description")
                             };
-
-                            // Tilføj badge til listen RequiredBadges i Activity
-                            currentActivity.RequiredBadges.Add(badge);
-                        }                       
-                                                
+                            currentActivity.RequiredBadges.Add(badge); // Tilføj badge til listen RequiredBadges i Activity
+                        }
                     }
 
                     if (!reader.IsDBNull(reader.GetOrdinal("member_id")))
@@ -216,108 +187,92 @@ namespace ScoutLibrary.Repositories
                                 Username = reader.GetString("username"),
                             };
                             currentActivity.Members.Add(member);
-                        }                     
-                        
+                        }
                     }
-
                 }
+                return activityDictionary.Values.ToList();
             }
-            return activityDictionary.Values.ToList();
+            catch(Exception ex)
+            {
+                throw new Exception("Fejl ved indlæsning fra databasen.");
+            }
         }
 
         public Activity GetById(int id)
         {
             Activity activity=null;
 
-            using(MySqlConnection connection = _db.Connect2())
+            using MySqlConnection connection = _db.Connect2();
+            string query = """
+                SELECT * FROM activities 
+                WHERE activity_id=@activity_id
+                """;
+            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@activity_id", id);
+
+            using MySqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
             {
-                string query = """
-                    SELECT * FROM activities 
-                    WHERE activity_id=@activity_id
-                    """;
-                using(MySqlCommand cmd = new MySqlCommand(query, connection))
+                activity = new Activity
                 {
-                    cmd.Parameters.AddWithValue("@activity_id", id);
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            activity = new Activity
-                            {
-                                ActivityId =id,
-                                Name = reader.GetString("name"),
-                                DateTime = reader.GetDateTime("date_time"),
-                                Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
-                                MaxCount = reader.IsDBNull(reader.GetOrdinal("max_count")) ? null : reader.GetInt32("max_count"),
-                                MinAge = reader.IsDBNull(reader.GetOrdinal("min_age")) ? null : reader.GetInt32("min_age"),
-                                RequiredBadges = new List<Badge>(),
-                                Members = new List<Member>()
-                            };
-                        }
-                    }
-                }
+                    ActivityId =id,
+                    Name = reader.GetString("name"),
+                    DateTime = reader.GetDateTime("date_time"),
+                    Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
+                    MaxCount = reader.IsDBNull(reader.GetOrdinal("max_count")) ? null : reader.GetInt32("max_count"),
+                    MinAge = reader.IsDBNull(reader.GetOrdinal("min_age")) ? null : reader.GetInt32("min_age"),
+                    RequiredBadges = new List<Badge>(),
+                    Members = new List<Member>()
+                };
+            }
 
-                if (activity == null)
+            if (activity == null)
+            {
+                return null;
+            }
+
+            //hent members
+            cmd.CommandText= """
+                    SELECT m.* 
+                    FROM activity_members am
+                    JOIN members m ON am.member_id = m.member_id
+                    WHERE am.activity_id = @activity_id
+                """;
+            
+            cmd.Parameters.AddWithValue("@activity_id", id);            
+            while (reader.Read())
+            {
+                Member member = new Member
                 {
-                    return null;
-                }
-
-                string memberQuery = """
-                        SELECT m.* 
-                        FROM activity_members am
-                        JOIN members m ON am.member_id = m.member_id
-                        WHERE am.activity_id = @activity_id
-                    """;
-                using (MySqlCommand cmdMembers = new MySqlCommand(memberQuery, connection))
-                {
-                    cmdMembers.Parameters.AddWithValue("@activity_id", id);
-                    using(MySqlDataReader reader = cmdMembers.ExecuteReader())
-                    {           
-                        while (reader.Read())
-                        {
-
-                            Member member = new Member
-                            {
-                                MemberId = reader.GetInt32("member_id"),
-                                FirstName = reader.GetString("first_name"),
-                                LastName = reader.GetString("last_name"),
-                                DateOfBirth = reader.GetDateTime("date_of_birth"),
-                                PhoneNumber = reader.GetString("phone_number"),
-                                IsLeader = reader.GetBoolean("is_leader"),
-                                Username = reader.GetString("username"),
-                            };
-                            activity.Members.Add(member);
-                            
-                            
-                        }
-                    }
-                }
-
-                string badgeQuery = """
-                    SELECT b.*
-                    FROM required_activity_badges ab
-                    JOIN badges b ON ab.badge_id = b.badge_id
-                    WHERE activity_id = @activity_id
-                    """;
-                using(MySqlCommand badgeCmd = new MySqlCommand(badgeQuery, connection))
-                {
-                    badgeCmd.Parameters.AddWithValue("@activity_id", id);
-                    using(MySqlDataReader reader = badgeCmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
+                    MemberId = reader.GetInt32("member_id"),
+                    FirstName = reader.GetString("first_name"),
+                    LastName = reader.GetString("last_name"),
+                    DateOfBirth = reader.GetDateTime("date_of_birth"),
+                    PhoneNumber = reader.GetString("phone_number"),
+                    IsLeader = reader.GetBoolean("is_leader"),
+                    Username = reader.GetString("username"),
+                };
+                activity.Members.Add(member);           
+            }
+            
+            //hent badges
+            cmd.CommandText = """
+                SELECT b.*
+                FROM required_activity_badges ab
+                JOIN badges b ON ab.badge_id = b.badge_id
+                WHERE activity_id = @activity_id
+                """;
+            cmd.Parameters.AddWithValue("@activity_id", id);
+            while (reader.Read())
+            {
                           
-                            Badge b = new Badge
-                            {
-                                BadgeId = reader.GetInt32("badge_id"),
-                                Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
-                                Name = reader.GetString("name")
-                            };
-                            activity.RequiredBadges.Add(b);
-                                
-                        }
-                    }
-                }  
+                Badge b = new Badge
+                {
+                    BadgeId = reader.GetInt32("badge_id"),
+                    Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
+                    Name = reader.GetString("name")
+                };
+                activity.RequiredBadges.Add(b);
             }
             return activity;
         }

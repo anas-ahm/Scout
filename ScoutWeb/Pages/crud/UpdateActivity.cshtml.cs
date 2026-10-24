@@ -75,13 +75,24 @@ namespace ScoutWeb.Pages.crud
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
+            LoadDropdowns(); //repopulerer listerne af objekter
+
+            List<Member> selectedLeaders = allMembers               //udvælger ledere fra den liste af ID'er der er valgt
+                .Where(m =>SelectedMembersId.Contains(m.MemberId))
+                .Where(m=>m.IsLeader).ToList();
+
+            if (selectedLeaders.Count == 0) //checker om listen er tom
+            {
+                ModelState.AddModelError(String.Empty,"Der skal vælges mindst én leder, for at gemme aktiviteten");
+            }
+
+            if (!ModelState.IsValid)        //kun hvis validering består fortsætter vi
             {
                 LoadDropdowns();                
                 return Page();
             }
 
-            LoadDropdowns(); //repopulerer listerne af objekter
+            
                         
             Activity updatedActivity = new Activity
             {
