@@ -4,43 +4,51 @@
     ViewData["Title"] = "Rediger Aktivitet";
 }
 
-<h2>Rediger Aktivitet</h2>
+<h1>Rediger Aktivitet</h1>
 
 <form method="post">
+    <!-- Skjult ID til opdatering -->
     <input type="hidden" asp-for="ActivityId" />
 
-    <div asp-validation-summary="ModelOnly"></div>
+    <!-- Viser generelle fejl fra ModelState -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+    <!-- Navn -->
     <div>
         <label asp-for="Name">Navn:</label><br />
-        <input asp-for="Name" />
-        <span asp-validation-for="Name"></span>
+        <input asp-for="Name" /><br />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
+    <!-- Dato og tid -->
     <div>
         <label asp-for="DateTime">Dato og tid:</label><br />
-        <input asp-for="DateTime" type="datetime-local" />
-        <span asp-validation-for="DateTime"></span>
+        <input asp-for="DateTime" type="datetime-local" /><br />
+        <span asp-validation-for="DateTime" class="text-danger"></span>
     </div>
 
+    <!-- Beskrivelse -->
     <div>
         <label asp-for="Description">Beskrivelse:</label><br />
-        <textarea asp-for="Description"></textarea>
-        <span asp-validation-for="Description"></span>
+        <textarea asp-for="Description"></textarea><br />
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
+    <!-- Maksimalt antal deltagere -->
     <div>
         <label asp-for="MaxCount">Maksimalt antal deltagere:</label><br />
-        <input asp-for="MaxCount" type="number" />
-        <span asp-validation-for="MaxCount"></span>
+        <input asp-for="MaxCount" type="number" /><br />
+        <span asp-validation-for="MaxCount" class="text-danger"></span>
     </div>
 
+    <!-- Minimumsalder -->
     <div>
         <label asp-for="MinAge">Minimumsalder:</label><br />
-        <input asp-for="MinAge" type="number" />
-        <span asp-validation-for="MinAge"></span>
+        <input asp-for="MinAge" type="number" /><br />
+        <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
 
+    <!-- Vælg Medlemmer / Leder(e) -->
     <div>
         <label asp-for="SelectedMembersId">Vælg Medlemmer / Leder(e):</label><br />
         <select asp-for="SelectedMembersId" multiple>
@@ -51,10 +59,12 @@
                     <option value="@member.MemberId">@member.FirstName @member.LastName (@(member.IsLeader ? "Leder" : "Medlem"))</option>
                 }
             }
-        </select>
-        <span asp-validation-for="SelectedMembersId"></span>
+        </select><br />
+        <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
+        <span asp-validation-for="SelectedMembersId" class="text-danger"></span>
     </div>
 
+    <!-- Påkrævede Badges -->
     <div>
         <label asp-for="SelectedBadgesId">Påkrævede Badges:</label><br />
         <select asp-for="SelectedBadgesId" multiple>
@@ -65,12 +75,14 @@
                     <option value="@badge.BadgeId">@badge.Name</option>
                 }
             }
-        </select>
-        <span asp-validation-for="SelectedBadgesId"></span>
+        </select><br />
+        <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
+        <span asp-validation-for="SelectedBadgesId" class="text-danger"></span>
     </div>
 
+    <!-- Knapper -->
     <div>
-        <button type="submit">Gem ændringer</button>
+        <button type="submit">Gem ændringer</button> 
         <a asp-page="../Index">Annuller</a>
     </div>
 </form>

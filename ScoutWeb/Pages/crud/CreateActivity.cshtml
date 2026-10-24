@@ -2,7 +2,7 @@
 @model ScoutWeb.Pages.crud.CreateActivityModel
 @using ScoutLibrary.Models;
 @{
-    ViewData["Title"] = "Opret aktivitet";    
+    ViewData["Title"] = "Opret aktivitet";
 }
 
 <h1>Opret ny aktivitet</h1>
@@ -13,72 +13,72 @@
 
     <!-- Navn -->
     <div>
-        <label asp-for="Name">Navn</label>
-        <input asp-for="Name" />
+        <label asp-for="Name">Navn</label><br />
+        <input asp-for="Name" /><br />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <!-- Dato og Tid -->
     <div>
-        <label asp-for="DateTime">Dato og tid</label>
-        <input asp-for="DateTime" />
+        <label asp-for="DateTime">Dato og tid</label><br />
+        <input asp-for="DateTime" /><br />
         <span asp-validation-for="DateTime" class="text-danger"></span>
     </div>
 
-    <!-- Beskrivelse (Brug evt. textarea til længere tekst) -->
+    <!-- Beskrivelse -->
     <div>
-        <label asp-for="Description">Beskrivelse</label>
-        <textarea asp-for="Description"></textarea>
+        <label asp-for="Description">Beskrivelse</label><br />
+        <textarea asp-for="Description"></textarea><br />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <!-- Max antal deltagere -->
     <div>
-        <label asp-for="MaxCount">Maks Deltagere</label>
-        <input asp-for="MaxCount" />
+        <label asp-for="MaxCount">Maks Deltagere</label><br />
+        <input asp-for="MaxCount" /><br />
         <span asp-validation-for="MaxCount" class="text-danger"></span>
     </div>
 
     <!-- Minimum alder -->
     <div>
-        <label asp-for="MinAge">Minimumsalder</label>
-        <input asp-for="MinAge" />
+        <label asp-for="MinAge">Minimumsalder</label><br />
+        <input asp-for="MinAge" /><br />
         <span asp-validation-for="MinAge" class="text-danger"></span>
     </div>
 
-    <!-- 1. Vælg mærker (Looper igennem AvailableBadges, gemmer i RequiredBadges) -->
+    <!-- Vælg mærker -->
     @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
     {
         <div>
-            <label for="SelectedBadges">Vælg tegn:</label>
+            <label for="SelectedBadges">Vælg tegn:</label><br />
             <select name="SelectedBadges" id="SelectedBadges" multiple>
                 @foreach (Badge badge in Model.AvailableBadges)
                 {
                     <option value="@badge.BadgeId">@badge.Name</option>
                 }
-            </select>
+            </select><br />
             <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
         </div>
     }
 
-    <!-- 2. Vælg ledere (Looper igennem AvailableLeaders, gemmer i Members) -->
+    <!-- Vælg ledere -->
     @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
     {
         <div>
-            <label for="SelectedLeaders">Vælg leder:  </label>
+            <label for="SelectedLeaders">Vælg leder:</label><br />
             <select name="SelectedLeaders" id="SelectedLeaders" multiple>
-                    @foreach(Member leader in Model.AvailableLeaders)
-                    {
-                        <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
-                    }
-                </select>
-            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
-            <!-- Denne linje udskriver fejlen, hvis ingen er valgt -->
+                @foreach (Member leader in Model.AvailableLeaders)
+                {
+                    <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
+                }
+            </select><br />
+            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
             <span asp-validation-for="SelectedLeaders" class="text-danger"></span>
         </div>
-    }   
+    }
 
     <!-- Submit knap -->
-    <button type="submit">Opret aktivitet</button>
+    <div style="margin-top: 15px;">
+        <button type="submit">Opret aktivitet</button>
+    </div>
 </form>
-

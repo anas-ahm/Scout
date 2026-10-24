@@ -234,10 +234,11 @@ namespace ScoutLibrary.Repositories
                 //Opdater selve aktiviteten
                 string activityQuery = """
                 UPDATE activities 
-                SET name = @name, date_time = @datetime, description = @description, max_count = @maxcount, min_age=@minage
-                WHERE activity_id=@activityid
+                SET name = @name, date_time = @date_time, description = @description, max_count = @max_count, min_age=@min_age
+                WHERE activity_id=@activity_id
                 """;
                 using MySqlCommand cmd = new MySqlCommand(activityQuery, connection, transaction);
+                cmd.Parameters.AddWithValue("@activity_id", id);
                 SetActivityParameters(cmd, activity);
                 cmd.ExecuteNonQuery();
 
