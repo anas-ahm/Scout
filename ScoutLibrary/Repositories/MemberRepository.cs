@@ -178,6 +178,36 @@ namespace ScoutLibrary.Repositories
                     }
                 }
                 
+                // Close the first reader, then load the badges with a new query
+                reader.Close();
+                
+                if (memberToRead is not null)
+                {
+                    string badgeSql = """
+                                      SELECT badges.badge_id, badges.name, badges.description
+                                      FROM member_badges
+                                      JOIN badges ON badges.badge_id = member_badges.badge_id
+                                      WHERE member_badges.member_id = @member_id
+                                      """;
+
+                    using MySqlCommand badgeCmd = new MySqlCommand(badgeSql, connString);
+                    badgeCmd.Parameters.AddWithValue("@member_id", id);
+
+                    using MySqlDataReader badgeReader = badgeCmd.ExecuteReader();
+
+                    while (badgeReader.Read())
+                    {
+                        Badge badge = new Badge();
+                        badge.BadgeId = badgeReader.GetInt32("badge_id");
+                        badge.Name = badgeReader.GetString("name");
+                        badge.Description = badgeReader.IsDBNull(badgeReader.GetOrdinal("description"))
+                            ? null
+                            : badgeReader.GetString("description");
+
+                        memberToRead.Badges.Add(badge);
+                    }
+                }
+
                 return memberToRead;
             }
             
@@ -195,8 +225,12 @@ namespace ScoutLibrary.Repositories
         {
             try
             {
-                string sql = """ SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username FROM members ORDER BY first_name""";
-
+                string sql = """
+                             SELECT member_id, first_name, last_name, date_of_birth, phone_number, is_leader, username
+                             FROM members
+                             ORDER BY first_name
+                             """;
+                
                 using MySqlConnection connString = _db.Connect();
 
                 using MySqlCommand cmd = new MySqlCommand(sql, connString);
@@ -217,9 +251,45 @@ namespace ScoutLibrary.Repositories
                 
                     memberList.Add(memberToAdd);
                 }
+                
+                // Close the first reader, then load all member badges in ONE query
+                reader.Close();
+                
+                string badgeSql = """
+                                  SELECT member_badges.member_id, badges.badge_id, badges.name, badges.description
+                                  FROM member_badges
+                                  JOIN badges ON badges.badge_id = member_badges.badge_id
+                                  """;
+                
+                using MySqlCommand badgeCmd = new MySqlCommand(badgeSql, connString);
+                using MySqlDataReader badgeReader = badgeCmd.ExecuteReader();
+
+                while (badgeReader.Read())
+                {
+                    int memberId = badgeReader.GetInt32("member_id");
+
+                    Badge badge = new Badge();
+                    badge.BadgeId = badgeReader.GetInt32("badge_id");
+                    badge.Name = badgeReader.GetString("name");
+                    badge.Description = badgeReader.IsDBNull(badgeReader.GetOrdinal("description"))
+                        ? null
+                        : badgeReader.GetString("description");
+
+                    // Find the member this badge belongs to and add it
+                    foreach (Member member in memberList)
+                    {
+                        if (member.MemberId == memberId)
+                        {
+                            member.Badges.Add(badge);
+                            break;
+                        }
+                    }
+                }
 
                 return memberList;   
             }
+            
+            
             catch (Exception ex)
             {
                 throw new Exception("Der opstod en fejl ved hentningen af spejdere ", ex);

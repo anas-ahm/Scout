@@ -47,6 +47,26 @@ else
                 <dd>@member.Username</dd>
             </div>
         </dl>
+        
+        <section class="profile__badges">
+            <h2 class="profile__subtitle">Badges</h2>
+
+            @if (member.Badges.Count == 0)
+            {
+                <p class="profile__empty">Ingen badges endnu.</p>
+            }
+            else
+            {
+                <ul class="badge-list">
+                    @foreach (Badge badge in member.Badges)
+                    {
+                        <li class="badge-list__item" title="@badge.Description">
+                            <span class="tag">@badge.Name</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
 
         <footer class="details__footer">
             <a class="btn btn--outline" asp-page="/Index" asp-fragment="medlemstabellen">Tilbage til medlemmer</a>

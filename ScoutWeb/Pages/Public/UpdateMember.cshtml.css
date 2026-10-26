@@ -8,3 +8,14 @@
   --form-max: 38rem;
   --form-accent: var(--forest-500);  /* green = editing */
 }
+
+/* Badge checkboxes in two columns, filling top to bottom */
+.form__checklist {
+  columns: 2;
+  column-gap: 1.5rem;
+}
+
+.form__checklist .form__check {
+  break-inside: avoid;   /* keeps a checkbox and its label together */
+  margin-bottom: 0.5rem;
+}

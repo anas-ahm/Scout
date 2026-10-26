@@ -27,3 +27,12 @@
 .profile__row dd {
   font-size: 1.05rem;
 }
+
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

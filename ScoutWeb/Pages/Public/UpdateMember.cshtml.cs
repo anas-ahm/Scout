@@ -3,7 +3,10 @@ using ScoutLibrary.Models;
 using ScoutLibrary.Service;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using ScoutLibrary.Repositories;
 
 
 namespace ScoutWeb.Pages.crud
@@ -12,14 +15,19 @@ namespace ScoutWeb.Pages.crud
     {
         // Connnecting to service
         private readonly ScoutService _scoutService;
+        private readonly ICRUD<Badge> _badgeService;
+        private readonly ICRUD<Member> _memberRepository;
 
-        public UpdateMemberModel(ScoutService scoutService)
+        public UpdateMemberModel(ScoutService scoutService, ICRUD<Member> memberRepository, ICRUD<Badge> badgeService)
         {
             _scoutService = scoutService;
+            _memberRepository = memberRepository;
+            _badgeService = badgeService;
         }
         
         public Member? memberToUpdate { get; set; }
         public bool memberFound { get; set; }
+        public List<Badge> allBadges { get; set; } = new();
         
         public LeaderInputModel LeaderInput { get; set; } = new();
         public ScoutInputModel ScoutInput { get; set; } = new();
@@ -27,6 +35,8 @@ namespace ScoutWeb.Pages.crud
         
         public IActionResult OnGet(int id)
         {
+            allBadges = _badgeService.GetAll();  
+            
             memberToUpdate = _scoutService.GetById(id);
 
             if (memberToUpdate == null)
@@ -46,6 +56,20 @@ namespace ScoutWeb.Pages.crud
 
         public IActionResult OnPostLeaderUpdateMember(int id, [Bind(Prefix = nameof(LeaderInput))] LeaderInputModel input)
         {
+            if (!User.IsInRole("Leader"))
+            {
+                return Forbid();
+            }
+            
+            allBadges = _badgeService.GetAll();  
+            memberToUpdate = _scoutService.GetById(id);
+            
+            if (memberToUpdate == null)
+            {
+                TempData["ErrorMessage"] = "Spejderen blev ikke fundet!";
+                return RedirectToPage("/Index");
+            }
+            
             // Now this sees the error above as well as the attribute errors
             if (!ModelState.IsValid)
             {
@@ -63,6 +87,12 @@ namespace ScoutWeb.Pages.crud
             memberToCreate.PhoneNumber = input.PhoneNumber;
             memberToCreate.IsLeader = input.IsLeader;
             memberToCreate.Username = input.Username;
+            
+            // Only keep the badges that were selected in the dropdown
+            memberToCreate.Badges = allBadges
+                .Where(b => input.SelectedBadgeIds.Contains(b.BadgeId))
+                .ToList();
+            
             try
             {
                 _scoutService.Update(memberToCreate, id);
@@ -76,9 +106,9 @@ namespace ScoutWeb.Pages.crud
                 return Page();
             }
 
-            TempData["SuccessMessage"] = $"{LeaderInput.FirstName} {LeaderInput.LastName} blev opdateret";
+            TempData["SuccessMessage"] = $"{input.FirstName} {input.LastName} blev opdateret";
             
-            return Redirect($"/crud/MemberDetails/{id}");
+            return Redirect($"/medlem/{id}");
         }
 
         public IActionResult OnPostScoutUpdateMember(int id, [Bind(Prefix = nameof(ScoutInput))] ScoutInputModel input)
@@ -110,6 +140,8 @@ namespace ScoutWeb.Pages.crud
             memberToCreate.IsLeader = memberToUpdate.IsLeader;
             memberToCreate.Username = memberToUpdate.Username;
             
+            memberToCreate.Badges = memberToUpdate.Badges;
+            
             try
             {
                 _scoutService.Update(memberToCreate, id);
@@ -125,7 +157,7 @@ namespace ScoutWeb.Pages.crud
 
             TempData["SuccessMessage"] = $"{memberToUpdate.FirstName} {memberToUpdate.LastName} blev opdateret";
             
-            return Redirect($"/crud/MemberDetails/{id}");
+            return Redirect($"/medlem/{id}");
             
         }
 
@@ -157,6 +189,7 @@ namespace ScoutWeb.Pages.crud
             [Required(ErrorMessage = "Brugernavn mangler")]
             public string Username { get; set; } = "";
             public bool IsLeader { get; set; }
+            public List<int> SelectedBadgeIds { get; set; } = new();
         }
     }
 }
