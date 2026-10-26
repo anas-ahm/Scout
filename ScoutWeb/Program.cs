@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/");
-    options.Conventions.AuthorizeFolder("/Leder", "LederPolicy");
+    options.Conventions.AuthorizeFolder("/Leder", "LeaderPolicy");
     options.Conventions.AllowAnonymousToPage("/Login");
     options.Conventions.AllowAnonymousToPage("/Signup");
 });
@@ -41,8 +41,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization(options=>         //laver autorisatonspolitikker, der bruges til at styre hvem der kan tilgå hvilke mapper/sider
 { 
-    options.AddPolicy("LederPolicy", policy => policy.RequireRole("Leder"));
-    options.AddPolicy("LederMemberPolicy", policy => policy.RequireRole("Leder", "Member"));
+    options.AddPolicy("LeaderPolicy", policy => policy.RequireRole("Leader"));
+    options.AddPolicy("LeaderMemberPolicy", policy => policy.RequireRole("Leader", "Member"));
 });
 
 var app = builder.Build();
