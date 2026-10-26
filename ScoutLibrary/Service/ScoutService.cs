@@ -63,6 +63,27 @@ public class ScoutService
                 throw new InvalidOperationException("Du er allerede tilmeldt denne aktivitet");
             }
             
+            if (activityToCheck.RequiredBadges != null)
+            {
+                foreach (Badge requiredBadge in activityToCheck.RequiredBadges)
+                {
+                    bool hasBadge = false;
+
+                    foreach (Badge memberBadge in member.Badges)
+                    {
+                        if (memberBadge.BadgeId == requiredBadge.BadgeId)
+                        {
+                            hasBadge = true;
+                        }
+                    }
+
+                    if (!hasBadge)
+                    {
+                        throw new InvalidOperationException("Du mangler badget: " + requiredBadge.Name);
+                    }
+                }
+            }
+            
             if (activityToCheck.Members.Count >= activityToCheck.MaxCount)
             {
                 throw new InvalidOperationException("Aktiviteten er allerede fuld");
