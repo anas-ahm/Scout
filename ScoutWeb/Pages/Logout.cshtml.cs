@@ -14,7 +14,7 @@ namespace ScoutWeb.Pages
 
             TempData["SuccessMessage"] = "Du er nu logget ud.";
 
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Login");
         }
     }
 }

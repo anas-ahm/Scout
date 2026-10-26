@@ -21,6 +21,14 @@ namespace ScoutWeb.Pages
             _memberAuthService = memberAuthService;
         }
 
+        public IActionResult OnGet()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Index");
+            }
+            return Page();
+        }
 
         public IActionResult OnPost()
         {

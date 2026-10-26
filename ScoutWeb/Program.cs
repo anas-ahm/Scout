@@ -29,7 +29,7 @@ builder.Services.AddTransient<BadgeService>();
 // Add cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
     {
-        options.LoginPath = "/Login";       //hvor du sendes hen hvis du prøver at tilgå en side der kræver login
+        options.LoginPath = "/log-ind";       //hvor du sendes hen hvis du prøver at tilgå en side der kræver login
         options.AccessDeniedPath = "/Index";  //hvor du sendes hen, hvis du er logget ind men prøver at tilgå en side du ikke er autoriseret til 
         options.Cookie.Name = "session-cookie"; // Set the name of the cookie
         options.Cookie.HttpOnly = true; // Prevent client side scripts from accessing the cookie
