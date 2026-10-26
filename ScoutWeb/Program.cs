@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages(options =>
-{ 
+{
+    options.Conventions.AuthorizeFolder("/");
     options.Conventions.AuthorizeFolder("/Leder", "LederPolicy");
     options.Conventions.AllowAnonymousToPage("/Login");
     options.Conventions.AllowAnonymousToPage("/Signup");
@@ -29,7 +30,7 @@ builder.Services.AddTransient<BadgeService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
     {
         options.LoginPath = "/Login";       //hvor du sendes hen hvis du prøver at tilgå en side der kræver login
-        options.AccessDeniedPath = "/Index";  //hvor du sendes hen, hvis du er logget ind men prøver at tilgå en side du ikke er autoriseret til 
+        //options.AccessDeniedPath = "/Index";  //hvor du sendes hen, hvis du er logget ind men prøver at tilgå en side du ikke er autoriseret til 
         options.Cookie.Name = "session-cookie"; // Set the name of the cookie
         options.Cookie.HttpOnly = true; // Prevent client side scripts from accessing the cookie
         // options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require https
