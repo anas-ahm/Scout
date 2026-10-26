@@ -1,0 +1,29 @@
+/* ==========================================================================
+   MemberDetails.cshtml.css
+   The card (.details), title, role pill (.tag) and footer come from site.css.
+   This file adds the narrower card and the labelled rows.
+   ========================================================================== */
+
+.profile {
+  max-width: 32rem;
+}
+
+/* Name gets an orange rule underneath, like a name tag */
+.profile .details__header {
+  padding-bottom: var(--space-3);
+  border-bottom: 3px solid var(--ember-500);
+}
+
+.profile__list {
+  margin: 0;
+}
+.profile__row {
+  padding: 0.65rem 0;
+  border-bottom: 1px dashed var(--color-border-strong);
+}
+.profile__row:last-child {
+  border-bottom: 0;
+}
+.profile__row dd {
+  font-size: 1.05rem;
+}

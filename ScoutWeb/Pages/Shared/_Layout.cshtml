@@ -1,69 +1,51 @@
-﻿
-
+﻿@{
+    // Marks the link for the page being viewed (aria-current="page"), no JavaScript needed.
+    // Returning null makes Razor leave the attribute out completely.
+    string? currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+    string? Current(string page) =>
+        string.Equals(currentPage, page, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ScoutWeb</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/ScoutWeb.styles.css" asp-append-version="true"/>
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- Bundle of all <Page>.cshtml.css files (ASP.NET CSS isolation) -->
+    <link rel="stylesheet" href="~/ScoutWeb.styles.css" asp-append-version="true" />
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" asp-area="" asp-page="/Index">ScoutWeb</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                    </li>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Logout">Log ud</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Login">Log ind</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Signup">Opret bruger</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
+    <a class="skip-link" href="#main">Spring til indhold</a>
+
+    <header class="site-header">
+        <nav class="site-nav" aria-label="Hovedmenu">
+            <a class="site-nav__brand" asp-page="/Index">Roskilde Spejder Klub</a>
+
+            <ul class="site-nav__list site-nav__list--end">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li><a asp-page="/Logout">Log ud</a></li>
+                }
+                else
+                {
+                    <li><a asp-page="/Login" aria-current="@Current("/Login")">Log ind</a></li>
+                    <li><a class="site-nav__cta" asp-page="/Signup" aria-current="@Current("/Signup")">Opret bruger</a></li>
+                }
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main" class="site-main">
         @RenderBody()
     </main>
-</div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2026 - ScoutWeb - <a asp-area="" asp-page="/Privacy">Privacy</a>
-    </div>
-</footer>
+    <footer class="site-footer">
+        <p>&copy; 2026 - ScoutWeb - <a asp-page="/Privacy">Privacy</a></p>
+    </footer>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-
-@await RenderSectionAsync("Scripts", required: false)
+    @* Optional: pages can still add their own scripts later *@
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

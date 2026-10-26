@@ -2,32 +2,54 @@
 @model ScoutWeb.Pages.Public.MemberDetailsModel
 @using ScoutLibrary.Models
 @{
+    ViewData["Title"] = "Spejderoplysninger";
 }
 
-<!-- SuccesMessage after redirects-->
+<!-- SuccessMessage after redirects -->
 @if (TempData["SuccessMessage"] is string successMessage)
 {
-    <div class="success-message" role="alert">
+    <div class="success-message" role="status">
         @successMessage
     </div>
 }
-<!-- end -->
 
 <!-- Detail section for members -->
 @if (!Model.memberFound)
 {
-    <p>Scout not found!</p>
-    <a asp-page="/Index">Go back to Home Page</a>
+    <div class="empty-state">
+        <p>Spejderen blev ikke fundet.</p>
+        <a class="btn btn--outline" asp-page="/Index">Tilbage til forsiden</a>
+    </div>
 }
 else
 {
-    <div>
-        <span>@Model.memberToShow!.FirstName @Model.memberToShow.LastName</span>
-        <span>@Model.memberToShow.DateOfBirth.ToString("dd-MM-yyyy")</span>
-        <span>@Model.memberToShow.PhoneNumber</span>
-        <span>@Model.memberToShow.Username</span>
-        <span>@(Model.memberToShow.IsLeader ? "Leder" : "Spejder")</span>
-    </div>
-}
-<!-- end -->
+    Member member = Model.memberToShow!;
 
+    <article class="details profile">
+        <header class="details__header">
+            <h1 class="details__title">@member.FirstName @member.LastName</h1>
+            <p class="details__meta">
+                <span class="tag @(member.IsLeader ? "tag--leader" : "")">@(member.IsLeader ? "Leder" : "Spejder")</span>
+            </p>
+        </header>
+
+        <dl class="profile__list">
+            <div class="profile__row">
+                <dt>Fødselsdato</dt>
+                <dd>@member.DateOfBirth.ToString("dd-MM-yyyy")</dd>
+            </div>
+            <div class="profile__row">
+                <dt>Telefon</dt>
+                <dd>@member.PhoneNumber</dd>
+            </div>
+            <div class="profile__row">
+                <dt>Brugernavn</dt>
+                <dd>@member.Username</dd>
+            </div>
+        </dl>
+
+        <footer class="details__footer">
+            <a class="btn btn--outline" asp-page="/Index" asp-fragment="medlemstabellen">Tilbage til medlemmer</a>
+        </footer>
+    </article>
+}

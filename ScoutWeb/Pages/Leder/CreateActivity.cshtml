@@ -1,85 +1,87 @@
 ﻿@page
 @model ScoutWeb.Pages.crud.CreateActivityModel
-@using ScoutLibrary.Models;
+@using ScoutLibrary.Models
 @{
     ViewData["Title"] = "Opret aktivitet";
 }
 
-<h1>Opret ny aktivitet</h1>
+<div class="form-page">
+    <h1 class="form-page__title">Opret ny aktivitet</h1>
 
-<form method="post">
-    <!-- Viser generelle fejl fra ModelState -->
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form method="post" class="form">
+        <!-- Viser generelle fejl fra ModelState -->
+        <div asp-validation-summary="ModelOnly" class="form__summary"></div>
 
-    <!-- Navn -->
-    <div>
-        <label asp-for="Name">Navn</label><br />
-        <input asp-for="Name" /><br />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <!-- Dato og Tid -->
-    <div>
-        <label asp-for="DateTime">Dato og tid</label><br />
-        <input asp-for="DateTime" /><br />
-        <span asp-validation-for="DateTime" class="text-danger"></span>
-    </div>
-
-    <!-- Beskrivelse -->
-    <div>
-        <label asp-for="Description">Beskrivelse</label><br />
-        <textarea asp-for="Description"></textarea><br />
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <!-- Max antal deltagere -->
-    <div>
-        <label asp-for="MaxCount">Maks Deltagere</label><br />
-        <input asp-for="MaxCount" /><br />
-        <span asp-validation-for="MaxCount" class="text-danger"></span>
-    </div>
-
-    <!-- Minimum alder -->
-    <div>
-        <label asp-for="MinAge">Minimumsalder</label><br />
-        <input asp-for="MinAge" /><br />
-        <span asp-validation-for="MinAge" class="text-danger"></span>
-    </div>
-
-    <!-- Vælg mærker -->
-    @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
-    {
-        <div>
-            <label for="SelectedBadges">Vælg tegn:</label><br />
-            <select name="SelectedBadges" id="SelectedBadges" multiple>
-                @foreach (Badge badge in Model.AvailableBadges)
-                {
-                    <option value="@badge.BadgeId">@badge.Name</option>
-                }
-            </select><br />
-            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+        <!-- Navn -->
+        <div class="form__field form__field--full">
+            <label asp-for="Name">Navn</label>
+            <input asp-for="Name" autofocus />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    }
 
-    <!-- Vælg ledere -->
-    @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
-    {
-        <div>
-            <label for="SelectedLeaders">Vælg leder:</label><br />
-            <select name="SelectedLeaders" id="SelectedLeaders" multiple>
-                @foreach (Member leader in Model.AvailableLeaders)
-                {
-                    <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
-                }
-            </select><br />
-            <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
-            <span asp-validation-for="SelectedLeaders" class="text-danger"></span>
+        <!-- Dato og tid -->
+        <div class="form__field form__field--full">
+            <label asp-for="DateTime">Dato og tid</label>
+            <input asp-for="DateTime" />
+            <span asp-validation-for="DateTime" class="text-danger"></span>
         </div>
-    }
 
-    <!-- Submit knap -->
-    <div>
-        <button type="submit">Opret aktivitet</button>
-        <a asp-page="../Index">Annuller</a>
-    </div>
-</form>
+        <!-- Beskrivelse -->
+        <div class="form__field form__field--full">
+            <label asp-for="Description">Beskrivelse</label>
+            <textarea asp-for="Description"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <!-- Max antal deltagere -->
+        <div class="form__field">
+            <label asp-for="MaxCount">Maks deltagere</label>
+            <input asp-for="MaxCount" />
+            <span asp-validation-for="MaxCount" class="text-danger"></span>
+        </div>
+
+        <!-- Minimum alder -->
+        <div class="form__field">
+            <label asp-for="MinAge">Minimumsalder</label>
+            <input asp-for="MinAge" />
+            <span asp-validation-for="MinAge" class="text-danger"></span>
+        </div>
+
+        <!-- Vælg mærker -->
+        @if (Model.AvailableBadges != null && Model.AvailableBadges.Count > 0)
+        {
+            <div class="form__field">
+                <label for="SelectedBadges">Vælg tegn</label>
+                <select name="SelectedBadges" id="SelectedBadges" multiple>
+                    @foreach (Badge badge in Model.AvailableBadges)
+                    {
+                        <option value="@badge.BadgeId">@badge.Name</option>
+                    }
+                </select>
+                <small class="form__hint">Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+            </div>
+        }
+
+        <!-- Vælg ledere -->
+        @if (Model.AvailableLeaders != null && Model.AvailableLeaders.Count > 0)
+        {
+            <div class="form__field">
+                <label for="SelectedLeaders">Vælg leder</label>
+                <select name="SelectedLeaders" id="SelectedLeaders" multiple>
+                    @foreach (Member leader in Model.AvailableLeaders)
+                    {
+                        <option value="@leader.MemberId">@leader.FirstName @leader.LastName</option>
+                    }
+                </select>
+                <small class="form__hint">Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+                <span asp-validation-for="SelectedLeaders" class="text-danger"></span>
+            </div>
+        }
+
+        <!-- Submit / annuller -->
+        <div class="form__actions form__actions--divided">
+            <button type="submit" class="btn">Opret aktivitet</button>
+            <a class="btn btn--outline" asp-page="/Index">Annuller</a>
+        </div>
+    </form>
+</div>

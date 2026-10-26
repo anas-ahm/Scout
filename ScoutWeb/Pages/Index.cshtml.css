@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Index.cshtml.css  -  home page (welcome hero, activity table, member table)
+   Scoped by ASP.NET: applies only to elements written in Index.cshtml.
+   Shared pieces (.btn, .card, .table, .tag, .actions, dialog) live in site.css.
+   ========================================================================== */
+
+/* --- Welcome hero ------------------------------------------------------- */
+.hero {
+  margin-bottom: var(--space-6);
+  padding: clamp(1.75rem, 4vw, 3rem) var(--space-5);
+  text-align: center;
+  color: var(--sand-50);
+  background:
+          radial-gradient(circle at 85% 20%, rgb(224 123 46 / 0.30), transparent 38%),
+          radial-gradient(circle at 10% 90%, rgb(134 171 87 / 0.28), transparent 42%),
+          linear-gradient(135deg, var(--forest-700), var(--forest-900));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.hero__title {
+  margin: 0 0 var(--space-4);
+  color: var(--sand-50);
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* --- "Opret aktivitet" / "Opret spejder" (leaders only) ------------------ */
+.toolbar {
+  margin-bottom: var(--space-3);
+}
+
+/* --- Table sections ----------------------------------------------------- */
+.panel {
+  margin-bottom: var(--space-6);
+  scroll-margin-top: var(--space-5);       /* for the #fragment after searching */
+}
+
+.panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-4);
+}
+.panel__title {
+  margin: 0;
+}
+.panel__title::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 4px;
+  margin-top: var(--space-2);
+  background: var(--ember-500);
+  border-radius: 2px;
+}
+
+/* --- Search ------------------------------------------------------------- */
+/* The search form itself (.search) is styled in site.css; here we only size
+   it inside the panel header. */
+.search {
+  flex: 1 1 18rem;
+  max-width: 34rem;
+}
+
+/* Keep date and time on one line in the activity table */
+#aktivitetsTabel td:nth-child(-n + 2) { white-space: nowrap; }

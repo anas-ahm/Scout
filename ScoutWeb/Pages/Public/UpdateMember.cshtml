@@ -1,0 +1,90 @@
+﻿@page "{id:int}"
+@model ScoutWeb.Pages.crud.UpdateMemberModel
+@using ScoutLibrary.Models
+@{
+    ViewData["Title"] = "Rediger oplysninger";
+}
+
+<!-- Update member form -->
+@if (Model.memberToUpdate != null)
+{
+    <div class="form-page">
+        <h1 class="form-page__title">Rediger oplysninger</h1>
+
+        @if (Model.memberToUpdate.IsLeader)
+        {
+            <form method="post" class="form" asp-page-handler="LeaderUpdateMember">
+
+                <div asp-validation-summary="All" class="form__summary"></div>
+
+                <div class="form__field">
+                    <label asp-for="LeaderInput.FirstName">Fornavn</label>
+                    <input asp-for="LeaderInput.FirstName" value="@Model.memberToUpdate.FirstName" autofocus />
+                    <span asp-validation-for="LeaderInput.FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form__field">
+                    <label asp-for="LeaderInput.LastName">Efternavn</label>
+                    <input asp-for="LeaderInput.LastName" value="@Model.memberToUpdate.LastName" />
+                    <span asp-validation-for="LeaderInput.LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form__field">
+                    <label asp-for="LeaderInput.DateOfBirth">Fødselsdato</label>
+                    @* A date input only understands yyyy-MM-dd, so the value must be formatted *@
+                    <input asp-for="LeaderInput.DateOfBirth" type="date" value="@Model.memberToUpdate.DateOfBirth.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="LeaderInput.DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <div class="form__field">
+                    <label asp-for="LeaderInput.PhoneNumber">Telefonnummer</label>
+                    <input asp-for="LeaderInput.PhoneNumber" type="tel" value="@Model.memberToUpdate.PhoneNumber" />
+                    <span asp-validation-for="LeaderInput.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form__field form__field--full">
+                    <label asp-for="LeaderInput.Username">Brugernavn</label>
+                    <input asp-for="LeaderInput.Username" value="@Model.memberToUpdate.Username" />
+                    <span asp-validation-for="LeaderInput.Username" class="text-danger"></span>
+                </div>
+
+                <div class="form__check">
+                    @* "checked" is only written when the member is a leader, so saving doesn't demote them *@
+                    <input asp-for="LeaderInput.IsLeader" type="checkbox" checked="@Model.memberToUpdate.IsLeader" />
+                    <label asp-for="LeaderInput.IsLeader">Er leder</label>
+                </div>
+
+                <div class="form__actions">
+                    <button type="submit" class="btn">Opdater</button>
+                    <a class="btn btn--outline" asp-page="/Index">Fortryd</a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <form method="post" class="form" asp-page-handler="ScoutUpdateMember">
+
+                <div asp-validation-summary="All" class="form__summary"></div>
+
+                <div class="form__field form__field--full">
+                    <label asp-for="ScoutInput.PhoneNumber">Telefonnummer</label>
+                    <input asp-for="ScoutInput.PhoneNumber" type="tel" value="@Model.memberToUpdate.PhoneNumber" autofocus />
+                    <span asp-validation-for="ScoutInput.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form__actions">
+                    <button type="submit" class="btn">Opdater</button>
+                    <a class="btn btn--outline" asp-page="/Index">Fortryd</a>
+                </div>
+            </form>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <p>Spejderen blev ikke fundet.</p>
+        <a class="btn btn--outline" asp-page="/Index">Tilbage til forsiden</a>
+    </div>
+}
+<!-- end -->

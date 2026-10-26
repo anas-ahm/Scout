@@ -2,27 +2,25 @@
 @model IndexModel
 @using ScoutLibrary.Models
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Forside";
+    bool isLeader = Model.LoggedInMember != null && Model.LoggedInMember.IsLeader;
 }
 
-<!-- SuccesMessage after redirects-->
+<!-- SuccessMessage after redirects -->
 @if (TempData["SuccessMessage"] is string successMessage)
 {
-    <div class="success-message" role="alert">
+    <div class="success-message" role="status">
         @successMessage
     </div>
 }
-<!-- end -->
 
-
-<!-- ErrorMessages after calls -->
+<!-- ErrorMessage after calls -->
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <div class="error-message" role="alert">
         @Model.ErrorMessage
     </div>
 }
-<!-- end -->
 
 <!-- ErrorMessage after redirects (for instance: member not found on the details page) -->
 @if (TempData["ErrorMessage"] is string redirectedErrorMessage)
@@ -31,213 +29,218 @@
         @redirectedErrorMessage
     </div>
 }
-<!-- end -->
 
 
+<!-- Welcome / personal profile section -->
+<section class="hero" aria-labelledby="welcome-title">
+    <h1 class="hero__title" id="welcome-title">Velkommen @(Model.LoggedInMember != null ? Model.LoggedInMember.GetFullName() : "gæst")</h1>
 
-<!-- Personal profile section -->
-<div class="text-center">
-    <h1>Velkommen @(@Model.LoggedInMember != null ? @Model.LoggedInMember.GetFullName() : "gæst") </h1>
-    
-    @if (Model.LoggedInMember != null)
+    <div class="hero__actions">
+        @if (Model.LoggedInMember != null)
+        {
+            <a class="btn btn--light" asp-page="/Public/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
+            <a class="btn btn--light" asp-page="/Public/UpdateMember" asp-route-id="@Model.LoggedInMember.MemberId">Rediger mine oplysninger</a>
+        }
+        else
+        {
+            <a class="btn btn--light" asp-page="/Login">Log ind</a>
+            <a class="btn btn--light" asp-page="/Signup">Opret bruger</a>
+        }
+    </div>
+</section>
+
+
+<!-- Activities -->
+@if (isLeader)
+{
+    <div class="toolbar">
+        <a class="btn btn--accent" asp-page="/Leder/CreateActivity">Opret aktivitet</a>
+    </div>
+}
+
+<section id="aktivitetsTabel" class="card panel" aria-labelledby="activities-title">
+    <div class="panel__header">
+        <h2 class="panel__title" id="activities-title">Aktiviteter</h2>
+
+        <form class="search" method="get" role="search" asp-fragment="aktivitetsTabel">
+            <label class="visually-hidden" asp-for="SearchQuery">Søg i aktiviteter</label>
+            <input asp-for="SearchQuery" placeholder="navn, spejdertegn, minimumsalder ..." />
+            <button type="submit">Søg</button>
+        </form>
+    </div>
+
+    @if (!Model.AllActivities.Any())
     {
-        <a asp-page="/Public/MemberDetails" asp-route-id="@Model.LoggedInMember.MemberId">Se mine personlige oplysninger</a>
-        <a asp-page="/Leder/UpdateMember" asp-route-id="@Model.LoggedInMember.MemberId">Rediger mine oplysninger</a>
+        <p class="empty-state">Ingen aktiviteter fundet.</p>
     }
-</div>
-<!-- end -->
-
-
-
-<!-- Button for create Activity for leaders -->
-@if (Model.LoggedInMember != null && Model.LoggedInMember.IsLeader)
-{
-    <a asp-page="/Leder/CreateActivity">Opret Aktivitet</a>
-}
-<!-- end -->
-
-<div id="aktivitetsTabel">
-    <form method="get" asp-fragment="aktivitetsTabel">
-        <input asp-for="SearchQuery" placeholder="navn, spejdertegn, minimumsalder ..." />
-        <button type="submit">Søg</button>
-    </form>
-    <!--Liste oversigt over alle aktiviter-->
-    <h1>Aktiviteter</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Dato</th>
-                <th>Tid</th>
-                <th>Navn</th>
-                <th>Max Antal</th>
-                <th>Min Alder</th>
-                <th>Deltagere</th>
-                <th>Handling</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Activity a in Model.AllActivities)
-            {
-                <tr>
-                    <td>@a.DateTime.ToString("yyyy-MM-dd")</td>
-                    <td>@a.DateTime.ToString("HH:mm")</td>
-                    <td>@a.Name</td>
-                    <td>@a.MaxCount</td>
-                    <td>@a.MinAge</td>
-
-                    <!-- Displaying Members/Leaders (showing their names or count) -->
-                    <td>
-                        @if (a.Members != null && a.Members.Count > 0)
-                        {
-                            @string.Join(", ", a.Members.Select(m => m.FirstName))
-                        }
-                        else
-                        {
-                            <span class="text-muted">Ingen tilmeldte</span>
-                        }
-                    </td>
-    <!--EDIT DELETE BUTTONS FOR ACTIIVTY - LEADER ONLY***********************************************-->
-                    <td>
-                        <div>
-                            <a asp-page="/Public/ActivityDetails" asp-route-id="@a.ActivityId" style="display:inline">
-                                Se mere
-                            </a>
-                        </div>
-
-                        @if (Model.LoggedInMember != null && Model.LoggedInMember.IsLeader)
-                        {
-                            <div>
-                                <a asp-page="/Leder/UpdateActivity" asp-route-id="@a.ActivityId" style="display:inline">
-                                    Rediger
-                                </a>
-                            </div>
-                        }
-
-                        <!--MODAL popup med ren HTML!___________ #Invoker Command API HTML attributes-->
-                        @if (Model.LoggedInMember != null && Model.LoggedInMember.IsLeader)
-                        {
-                            <button type="button" command="show-modal" commandfor="delete-dialog-@a.ActivityId">
-                                Slet
-                            </button>
-                            <!-- 2. Selve dialogen med unikt ID -->
-                            <dialog id="delete-dialog-@a.ActivityId">
-                                <p>Vil du slette aktiviteten <strong>@a.Name</strong>?</p>
-
-                                <div>
-                                    <!-- Fortryd-knap: Lukker dialogen igen uden at gøre noget -->
-                                    <button type="button" command="close" commandfor="delete-dialog-@a.ActivityId">
-                                        Fortryd
-                                    </button>
-
-                                    <!-- Bekræft-knap: Sender data til din C#-PageHandler med ID -->
-                                    <form method="post" asp-page-handler="DeleteActivity" asp-route-id="@a.ActivityId" style="display:inline;">
-                                        <button type="submit">Bekræft</button>
-                                    </form>
-                                </div>
-                            </dialog>
-                        }
-                        <!--MODAL popup med ren HTML slut__________________________________________-->
-                    
-                        @if (Model.LoggedInMember != null)
-                        {
-                            if (!Model.AssignedActivityIds.Contains(a.ActivityId))
-                            {
-                                <form method="post" asp-page-handler="AssignActivity" asp-route-activityId="@a.ActivityId">
-                                    <button type="submit">Tilmeld aktivitet</button>
-                                </form>
-                            }
-                            else
-                            {
-                                <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId" onsubmit="return confirm('Er du sikker på, at du vil afmelde denne aktivitet?');">
-                                    <button type="submit" >Afmeld aktivitet</button>
-                                </form>
-                            }
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-
-
-<!-- Button for create Scout for leaders -->
-@if (Model.LoggedInMember != null && Model.LoggedInMember.IsLeader)
-{
-    <a asp-page="/Leder/CreateMember">Opret Spejder</a>
-}
-<!-- end -->
-
-<div id="medlemstabellen">
-<form method="get" asp-fragment="medlemstabellen">
-    <input asp-for="SearchMember" placeholder="navn, spejdertegn, alder ..." />
-    <button type="submit">Søg</button>
-</form>
-<!-- List over all Scouts-->
-
-    <h1>Medlemmer</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Navn</th>
-                <th>Fødselsdato</th>
-                <th>Telefon</th>
-                <th>Brugernavn</th>
-                <th>Rolle</th>
-                <th>Handling</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Member member in Model.memberList)
-            {
-                <tr>
-                    <td>@member.FirstName @member.LastName</td>
-                    <td>@member.DateOfBirth.ToString("dd-MM-yyyy")</td>
-                    <td>@member.PhoneNumber</td>
-                    <td>@member.Username</td>
-                    <td>@(member.IsLeader ? "Leder" : "Spejder")</td>
-                    <td>
-                        <!-- Handlinger samlet i én kolonne -->
-                        <div><a asp-page="/Public/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a></div>
-
-                        @if (Model.LoggedInMember != null && Model.LoggedInMember.IsLeader)
-                        {
-                            <div><a asp-page="/Leder/UpdateMember" asp-route-id="@member.MemberId">Rediger</a></div>
-
-                            <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId"
-                                onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
-                                <button type="submit">Slet</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
- @*    @foreach (Member member in Model.memberList)
+    else
     {
-        <div class="member">
-            <span>@member.FirstName @member.LastName</span>
-            <span>@member.DateOfBirth.ToString("dd-MM-yyyy")</span>
-            <span>@member.PhoneNumber</span>
-            <span>@member.Username</span>
-            <span>@(member.IsLeader ? "Leder" : "Spejder")</span>
-        
-            <a asp-page="/Public/MemberDetails" asp-route-id="@member.MemberId">Se Detaljer</a>
-        
-            <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId"
-                  onsubmit="return confirm('Er du sikker på, at du vil slette denne spejder?');">
-                <button type="submit">Slet</button>
-            </form>
-        
-            <a asp-page="/Leder/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
-        
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Dato</th>
+                        <th scope="col">Tid</th>
+                        <th scope="col">Navn</th>
+                        <th scope="col">Max antal</th>
+                        <th scope="col">Min alder</th>
+                        <th scope="col">Deltagere</th>
+                        <th scope="col">Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Activity a in Model.AllActivities)
+                    {
+                        <tr>
+                            <td>@a.DateTime.ToString("yyyy-MM-dd")</td>
+                            <td>@a.DateTime.ToString("HH:mm")</td>
+                            <td>@a.Name</td>
+                            <td>@a.MaxCount</td>
+                            <td>@a.MinAge</td>
+
+                            <!-- Displaying Members/Leaders (showing their names) -->
+                            <td>
+                                @if (a.Members != null && a.Members.Count > 0)
+                                {
+                                    @string.Join(", ", a.Members.Select(m => m.FirstName))
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Ingen tilmeldte</span>
+                                }
+                            </td>
+
+                            <td>
+                                <div class="actions">
+                                    <a class="btn btn--outline btn--sm" asp-page="/Public/ActivityDetails" asp-route-id="@a.ActivityId">Se mere</a>
+
+                                    @if (isLeader)
+                                    {
+                                        <a class="btn btn--outline btn--sm" asp-page="/Leder/UpdateActivity" asp-route-id="@a.ActivityId">Rediger</a>
+
+                                        <!-- MODAL popup with plain HTML (Invoker Commands API, no JavaScript) -->
+                                        <button type="button" class="btn btn--danger-outline btn--sm" command="show-modal" commandfor="delete-dialog-@a.ActivityId">Slet</button>
+
+                                        <dialog id="delete-dialog-@a.ActivityId" aria-labelledby="delete-title-@a.ActivityId">
+                                            <form method="post" asp-page-handler="DeleteActivity" asp-route-id="@a.ActivityId">
+                                                <p id="delete-title-@a.ActivityId">Vil du slette aktiviteten <strong>@a.Name</strong>?</p>
+
+                                                <div class="dialog__actions">
+                                                    <button type="button" class="btn btn--outline" command="close" commandfor="delete-dialog-@a.ActivityId">Fortryd</button>
+                                                    <button type="submit" class="btn btn--danger">Bekræft</button>
+                                                </div>
+                                            </form>
+                                        </dialog>
+                                    }
+
+                                    @if (Model.LoggedInMember != null)
+                                    {
+                                        if (!Model.AssignedActivityIds.Contains(a.ActivityId))
+                                        {
+                                            <form method="post" asp-page-handler="AssignActivity" asp-route-activityId="@a.ActivityId">
+                                                <button type="submit" class="btn btn--sm">Tilmeld aktivitet</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn--bark btn--sm" command="show-modal" commandfor="unassign-dialog-@a.ActivityId">Afmeld aktivitet</button>
+
+                                            <dialog id="unassign-dialog-@a.ActivityId" aria-labelledby="unassign-title-@a.ActivityId">
+                                                <form method="post" asp-page-handler="UnAssignActivity" asp-route-activityId="@a.ActivityId">
+                                                    <p id="unassign-title-@a.ActivityId">Er du sikker på, at du vil afmelde <strong>@a.Name</strong>?</p>
+
+                                                    <div class="dialog__actions">
+                                                        <button type="button" class="btn btn--outline" command="close" commandfor="unassign-dialog-@a.ActivityId">Fortryd</button>
+                                                        <button type="submit" class="btn btn--danger">Afmeld</button>
+                                                    </div>
+                                                </form>
+                                            </dialog>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-    } *@
-</div>
-<!-- end -->
+    }
+</section>
 
 
+<!-- Members -->
+@if (isLeader)
+{
+    <div class="toolbar">
+        <a class="btn btn--accent" asp-page="/Leder/CreateMember">Opret spejder</a>
+    </div>
+}
 
+<section id="medlemstabellen" class="card panel" aria-labelledby="members-title">
+    <div class="panel__header">
+        <h2 class="panel__title" id="members-title">Medlemmer</h2>
+
+        <form class="search" method="get" role="search" asp-fragment="medlemstabellen">
+            <label class="visually-hidden" asp-for="SearchMember">Søg i medlemmer</label>
+            <input asp-for="SearchMember" placeholder="navn, spejdertegn, alder ..." />
+            <button type="submit">Søg</button>
+        </form>
+    </div>
+
+    @if (!Model.memberList.Any())
+    {
+        <p class="empty-state">Ingen medlemmer fundet.</p>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Navn</th>
+                        <th scope="col">Fødselsdato</th>
+                        <th scope="col">Telefon</th>
+                        <th scope="col">Brugernavn</th>
+                        <th scope="col">Rolle</th>
+                        <th scope="col">Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Member member in Model.memberList)
+                    {
+                        <tr>
+                            <td>@member.FirstName @member.LastName</td>
+                            <td>@member.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                            <td>@member.PhoneNumber</td>
+                            <td>@member.Username</td>
+                            <td><span class="tag @(member.IsLeader ? "tag--leader" : "")">@(member.IsLeader ? "Leder" : "Spejder")</span></td>
+                            <td>
+                                <div class="actions">
+                                    <a class="btn btn--outline btn--sm" asp-page="/Public/MemberDetails" asp-route-id="@member.MemberId">Se detaljer</a>
+
+                                    @if (isLeader)
+                                    {
+                                        <a class="btn btn--outline btn--sm" asp-page="/Leder/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
+
+                                        <button type="button" class="btn btn--danger-outline btn--sm" command="show-modal" commandfor="delete-member-dialog-@member.MemberId">Slet</button>
+
+                                        <dialog id="delete-member-dialog-@member.MemberId" aria-labelledby="delete-member-title-@member.MemberId">
+                                            <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId">
+                                                <p id="delete-member-title-@member.MemberId">Er du sikker på, at du vil slette <strong>@member.FirstName @member.LastName</strong>?</p>
+
+                                                <div class="dialog__actions">
+                                                    <button type="button" class="btn btn--outline" command="close" commandfor="delete-member-dialog-@member.MemberId">Fortryd</button>
+                                                    <button type="submit" class="btn btn--danger">Slet</button>
+                                                </div>
+                                            </form>
+                                        </dialog>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

@@ -1,23 +1,54 @@
 @page
 @model ScoutWeb.Pages.Public.ActivityDetailsModel
-
+@using ScoutLibrary.Models
 @{
+    ViewData["Title"] = Model.activity.Name;
 }
-@using ScoutLibrary.Models;
 
-<div>
-    <p>@Model.activity.Name</p>
-    <p>@Model.activity.ActivityId</p>
-    <p>@Model.activity.DateTime</p>
-    <p>@Model.activity.MaxCount</p>
-    <p>@Model.activity.MinAge</p>
-    <p>@Model.activity.Description</p>
-        
-    @foreach(Badge b in Model.activity.RequiredBadges)
+<article class="details">
+    <header class="details__header">
+        <h1 class="details__title">@Model.activity.Name</h1>
+        <p class="details__meta">Aktivitet #@Model.activity.ActivityId</p>
+    </header>
+
+    <dl class="facts">
+        <div class="fact">
+            <dt>Dato og tid</dt>
+            <dd>@Model.activity.DateTime.ToString("dd-MM-yyyy 'kl.' HH:mm")</dd>
+        </div>
+        <div class="fact">
+            <dt>Maks deltagere</dt>
+            <dd>@Model.activity.MaxCount</dd>
+        </div>
+        <div class="fact">
+            <dt>Minimumsalder</dt>
+            <dd>@Model.activity.MinAge</dd>
+        </div>
+    </dl>
+
+    <section class="details__section" aria-labelledby="description-title">
+        <h2 class="details__heading" id="description-title">Beskrivelse</h2>
+        <p class="description">@Model.activity.Description</p>
+    </section>
+
+    @if (Model.activity.RequiredBadges != null && Model.activity.RequiredBadges.Any())
     {
-        <p>@b.BadgeId</p>
-        <p>@b.Name</p>
-        <p>@b.Description</p>
+        <section class="details__section" aria-labelledby="badges-title">
+            <h2 class="details__heading" id="badges-title">Påkrævede tegn</h2>
+
+            <ul class="badge-list">
+                @foreach (Badge b in Model.activity.RequiredBadges)
+                {
+                    <li class="badge-card">
+                        <h3 class="badge-card__name">@b.Name</h3>
+                        <p class="badge-card__desc">@b.Description</p>
+                    </li>
+                }
+            </ul>
+        </section>
     }
-    
-</div>
+
+    <footer class="details__footer">
+        <a class="btn btn--outline" asp-page="/Index" asp-fragment="aktivitetsTabel">Tilbage til aktiviteter</a>
+    </footer>
+</article>

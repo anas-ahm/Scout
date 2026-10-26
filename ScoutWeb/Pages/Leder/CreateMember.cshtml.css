@@ -1,0 +1,10 @@
+/* ==========================================================================
+   CreateMember.cshtml.css  -  new scout form
+   Heading, card and fields come from site.css (.form-page / .form). Fields
+   sit two per row when there is room and stack on narrow screens.
+   ========================================================================== */
+
+.form-page {
+  --form-max: 38rem;
+  --form-accent: var(--ember-500);   /* orange = create */
+}

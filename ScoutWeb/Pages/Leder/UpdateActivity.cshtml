@@ -1,88 +1,90 @@
 ﻿@page "{id:int}"
 @model ScoutWeb.Pages.crud.UpdateActivityModel
 @{
-    ViewData["Title"] = "Rediger Aktivitet";
+    ViewData["Title"] = "Rediger aktivitet";
 }
 
-<h1>Rediger Aktivitet</h1>
+<div class="form-page">
+    <h1 class="form-page__title">Rediger aktivitet</h1>
 
-<form method="post">
-    <!-- Skjult ID til opdatering -->
-    <input type="hidden" asp-for="ActivityId" />
+    <form method="post" class="form">
+        <!-- Skjult ID til opdatering -->
+        <input type="hidden" asp-for="ActivityId" />
 
-    <!-- Viser generelle fejl fra ModelState -->
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <!-- Viser generelle fejl fra ModelState -->
+        <div asp-validation-summary="ModelOnly" class="form__summary"></div>
 
-    <!-- Navn -->
-    <div>
-        <label asp-for="Name">Navn:</label><br />
-        <input asp-for="Name" /><br />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+        <!-- Navn -->
+        <div class="form__field form__field--full">
+            <label asp-for="Name">Navn</label>
+            <input asp-for="Name" autofocus />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
 
-    <!-- Dato og tid -->
-    <div>
-        <label asp-for="DateTime">Dato og tid:</label><br />
-        <input asp-for="DateTime" type="datetime-local" /><br />
-        <span asp-validation-for="DateTime" class="text-danger"></span>
-    </div>
+        <!-- Dato og tid -->
+        <div class="form__field form__field--full">
+            <label asp-for="DateTime">Dato og tid</label>
+            <input asp-for="DateTime" type="datetime-local" />
+            <span asp-validation-for="DateTime" class="text-danger"></span>
+        </div>
 
-    <!-- Beskrivelse -->
-    <div>
-        <label asp-for="Description">Beskrivelse:</label><br />
-        <textarea asp-for="Description"></textarea><br />
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+        <!-- Beskrivelse -->
+        <div class="form__field form__field--full">
+            <label asp-for="Description">Beskrivelse</label>
+            <textarea asp-for="Description"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
 
-    <!-- Maksimalt antal deltagere -->
-    <div>
-        <label asp-for="MaxCount">Maksimalt antal deltagere:</label><br />
-        <input asp-for="MaxCount" type="number" /><br />
-        <span asp-validation-for="MaxCount" class="text-danger"></span>
-    </div>
+        <!-- Maksimalt antal deltagere -->
+        <div class="form__field">
+            <label asp-for="MaxCount">Maksimalt antal deltagere</label>
+            <input asp-for="MaxCount" type="number" />
+            <span asp-validation-for="MaxCount" class="text-danger"></span>
+        </div>
 
-    <!-- Minimumsalder -->
-    <div>
-        <label asp-for="MinAge">Minimumsalder:</label><br />
-        <input asp-for="MinAge" type="number" /><br />
-        <span asp-validation-for="MinAge" class="text-danger"></span>
-    </div>
+        <!-- Minimumsalder -->
+        <div class="form__field">
+            <label asp-for="MinAge">Minimumsalder</label>
+            <input asp-for="MinAge" type="number" />
+            <span asp-validation-for="MinAge" class="text-danger"></span>
+        </div>
 
-    <!-- Vælg Medlemmer / Leder(e) -->
-    <div>
-        <label asp-for="SelectedMembersId">Vælg Medlemmer / Leder(e):</label><br />
-        <select asp-for="SelectedMembersId" multiple>
-            @if (Model.allMembers != null)
-            {
-                @foreach (var member in Model.allMembers)
+        <!-- Vælg medlemmer / leder(e) -->
+        <div class="form__field">
+            <label asp-for="SelectedMembersId">Vælg medlemmer / leder(e)</label>
+            <select asp-for="SelectedMembersId" multiple>
+                @if (Model.allMembers != null)
                 {
-                    <option value="@member.MemberId">@member.FirstName @member.LastName (@(member.IsLeader ? "Leder" : "Medlem"))</option>
+                    @foreach (var member in Model.allMembers)
+                    {
+                        <option value="@member.MemberId">@member.FirstName @member.LastName (@(member.IsLeader ? "Leder" : "Medlem"))</option>
+                    }
                 }
-            }
-        </select><br />
-        <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
-        <span asp-validation-for="SelectedMembersId" class="text-danger"></span>
-    </div>
+            </select>
+            <small class="form__hint">Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+            <span asp-validation-for="SelectedMembersId" class="text-danger"></span>
+        </div>
 
-    <!-- Påkrævede Badges -->
-    <div>
-        <label asp-for="SelectedBadgesId">Påkrævede Badges:</label><br />
-        <select asp-for="SelectedBadgesId" multiple>
-            @if (Model.allBadges != null)
-            {
-                @foreach (var badge in Model.allBadges)
+        <!-- Påkrævede badges -->
+        <div class="form__field">
+            <label asp-for="SelectedBadgesId">Påkrævede badges</label>
+            <select asp-for="SelectedBadgesId" multiple>
+                @if (Model.allBadges != null)
                 {
-                    <option value="@badge.BadgeId">@badge.Name</option>
+                    @foreach (var badge in Model.allBadges)
+                    {
+                        <option value="@badge.BadgeId">@badge.Name</option>
+                    }
                 }
-            }
-        </select><br />
-        <small>Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small><br />
-        <span asp-validation-for="SelectedBadgesId" class="text-danger"></span>
-    </div>
+            </select>
+            <small class="form__hint">Hold Ctrl (eller Cmd på Mac) nede for at vælge flere.</small>
+            <span asp-validation-for="SelectedBadgesId" class="text-danger"></span>
+        </div>
 
-    <!-- Knapper -->
-    <div>
-        <button type="submit">Gem ændringer</button> 
-        <a asp-page="../Index">Annuller</a>
-    </div>
-</form>
+        <!-- Knapper -->
+        <div class="form__actions form__actions--divided">
+            <button type="submit" class="btn">Gem ændringer</button>
+            <a class="btn btn--outline" asp-page="/Index">Annuller</a>
+        </div>
+    </form>
+</div>

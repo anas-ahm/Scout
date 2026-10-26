@@ -1,0 +1,14 @@
+/* ==========================================================================
+   Signup.cshtml.css  -  registration card
+   Layout comes from site.css (.form-page--auth / .form). Fields sit two per
+   row when there is room (min 14rem each) and stack on narrow screens.
+   ========================================================================== */
+
+.form-page {
+  --form-max: 38rem;
+  --form-accent: var(--ember-500);
+}
+
+.form__actions {
+  margin-top: var(--space-2);
+}

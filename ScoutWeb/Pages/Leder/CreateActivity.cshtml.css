@@ -1,0 +1,14 @@
+/* ==========================================================================
+   CreateActivity.cshtml.css  -  new activity form
+   Heading, card and fields come from site.css (.form-page / .form).
+   ========================================================================== */
+
+.form-page {
+  --form-max: 44rem;                 /* wider: long form with multi-selects */
+  --form-accent: var(--ember-500);   /* orange = create */
+}
+
+/* Multi-selects a bit taller so several options are visible */
+select[multiple] {
+  min-height: 12rem;
+}

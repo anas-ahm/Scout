@@ -1,0 +1,16 @@
+/* ==========================================================================
+   Login.cshtml.css  -  sign-in card
+   The card, tent emblem, fields and footer link come from site.css
+   (.form-page--auth / .form / .form__field). Only the page-specific values
+   are set here.
+   ========================================================================== */
+
+.form-page {
+  --form-max: 26rem;                 /* narrow card: only two fields */
+  --form-accent: var(--ember-500);   /* orange top edge */
+}
+
+/* A little more air around the single submit button */
+.form__actions {
+  margin-top: var(--space-2);
+}

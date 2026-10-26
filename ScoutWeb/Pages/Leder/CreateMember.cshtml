@@ -1,56 +1,61 @@
 ﻿@page
 @model ScoutWeb.Pages.crud.CreateMemberModel
+@{
+    ViewData["Title"] = "Opret spejder";
+}
 
+<!-- Form for creating new scout -->
+<div class="form-page">
+    <h1 class="form-page__title">Opret spejder</h1>
 
+    <form method="post" class="form">
+        <div asp-validation-summary="ModelOnly" class="form__summary"></div>
 
-<!-- Form for creating new scout-->
-<h2>Create Scout</h2>
+        <div class="form__field">
+            <label asp-for="Input.FirstName">Fornavn</label>
+            <input asp-for="Input.FirstName" autofocus />
+            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+        </div>
 
-<form method="post">
-    
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form__field">
+            <label asp-for="Input.LastName">Efternavn</label>
+            <input asp-for="Input.LastName" />
+            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+        </div>
 
-    <div>
-        <label asp-for="Input.FirstName">Fornavn</label>
-        <input asp-for="Input.FirstName"/>
-        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-    </div>
+        <div class="form__field">
+            <label asp-for="Input.DateOfBirth">Fødselsdato</label>
+            <input asp-for="Input.DateOfBirth" type="date" />
+            <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+        </div>
 
-    <div>
-        <label asp-for="Input.LastName">Efternavn</label>
-        <input asp-for="Input.LastName"></input>
-        <span asp-validation-for="Input.LastName" class="text-danger"></span>
-    </div>
+        <div class="form__field">
+            <label asp-for="Input.PhoneNumber">Telefonnummer</label>
+            <input asp-for="Input.PhoneNumber" type="tel" />
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+        </div>
 
-    <div>
-        <label asp-for="Input.DateOfBirth"></label>
-        <input asp-for="Input.DateOfBirth" type="date"/>
-        <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
-    </div>
+        <div class="form__field">
+            <label asp-for="Input.Username">Brugernavn</label>
+            <input asp-for="Input.Username" autocomplete="off" />
+            <span asp-validation-for="Input.Username" class="text-danger"></span>
+        </div>
 
-    <div>
-        <label asp-for="Input.PhoneNumber"></label>
-        <input asp-for="Input.PhoneNumber"/>
-        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-    </div>
+        <div class="form__field">
+            <label asp-for="Input.Password">Adgangskode</label>
+            <input asp-for="Input.Password" type="password" autocomplete="new-password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
 
-    <div>
-        <label asp-for="Input.Username"></label>
-        <input asp-for="Input.Username"/>
-        <span asp-validation-for="Input.Username" class="text-danger"></span>
-    </div>
+        <div class="form__check">
+            <input asp-for="Input.IsLeader" type="checkbox" />
+            <label asp-for="Input.IsLeader">Er leder</label>
+        </div>
 
-    <div>
-        <label asp-for="Input.Password"></label>
-        <input asp-for="Input.Password" type="password"/>
-        <span asp-validation-for="Input.Password" class="text-danger"></span>
-    </div>
-
-    <div>
-        <label asp-for="Input.IsLeader"></label>
-        <input asp-for="Input.IsLeader" type="checkbox"/>
-    </div>
-
-    <button type="submit">Create</button>
-</form>
+        <div class="form__actions">
+            <button type="submit" class="btn">Opret spejder</button>
+            <a class="btn btn--outline" asp-page="/Index">Annuller</a>
+        </div>
+    </form>
+</div>
 <!-- end -->

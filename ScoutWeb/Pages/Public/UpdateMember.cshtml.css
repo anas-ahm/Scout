@@ -1,0 +1,10 @@
+/* ==========================================================================
+   UpdateMember.cshtml.css  -  edit member
+   Two forms share this page: the leader form (several fields) and the scout
+   form (phone number only). Heading, card and fields come from site.css.
+   ========================================================================== */
+
+.form-page {
+  --form-max: 38rem;
+  --form-accent: var(--forest-500);  /* green = editing */
+}
