@@ -59,21 +59,7 @@ namespace ScoutWeb.Pages
 
         public void LoginAuth(Member member)
         {
-            // Create claims for the logged-in user, meaning the information we want to store in the cookie
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
-
-                new Claim(ClaimTypes.Name, member.Username),
-
-                new Claim(ClaimTypes.Role, member.IsLeader ? "Leader" : "Member")
-            };
-
-            // Create a ClaimsIdentity with the claims and the authentication scheme, which represents the user's identity
-            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Create a ClaimsPrincipal with the identity, which represents the logged-in user
-            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+            ClaimsPrincipal principal = _memberAuthService.LoginUser(member);
 
             // ASP.NET Core provides an asynchronous method.
             // GetAwaiter().GetResult() lets us call it synchronously.
