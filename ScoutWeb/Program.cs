@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages(options =>
 { 
-    options.Conventions.AuthorizeFolder("/crud", "LederPolicy");
+    options.Conventions.AuthorizeFolder("/Leder", "LederPolicy");
     options.Conventions.AllowAnonymousToPage("/Login");
     options.Conventions.AllowAnonymousToPage("/Signup");
 });

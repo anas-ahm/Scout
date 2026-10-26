@@ -3,7 +3,7 @@ using ScoutLibrary.Models;
 using ScoutLibrary.Service;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ScoutWeb.Pages.crud;
+namespace ScoutWeb.Pages.Public;
 
 public class MemberDetailsModel : PageModel
 {
