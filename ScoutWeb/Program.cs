@@ -7,7 +7,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{ 
+    options.Conventions.AuthorizeFolder("/crud", "LederPolicy");
+    options.Conventions.AllowAnonymousToPage("/Login");
+    options.Conventions.AllowAnonymousToPage("/Signup");
+});
 builder.Services.AddScoped<ScoutLibrary.DBWorker>();
 builder.Services.AddScoped<ICRUD<Activity>, ActivityRepository>();
 builder.Services.AddScoped<ICRUD<Member>, MemberRepository>();
@@ -23,6 +28,8 @@ builder.Services.AddTransient<BadgeService>();
 // Add cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
     {
+        options.LoginPath = "/Login";       //hvor du sendes hen hvis du prøver at tilgå en side der kræver login
+        options.AccessDeniedPath = "/Index";  //hvor du sendes hen, hvis du er logget ind men prøver at tilgå en side du ikke er autoriseret til 
         options.Cookie.Name = "session-cookie"; // Set the name of the cookie
         options.Cookie.HttpOnly = true; // Prevent client side scripts from accessing the cookie
         // options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require https
@@ -30,7 +37,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set the expiration time for the cookie
         options.SlidingExpiration = true; // Increases the expiration time if the user is still active
     });
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization(options=>         //laver autorisatonspolitikker, der bruges til at styre hvem der kan tilgå hvilke mapper/sider
+{ 
+    options.AddPolicy("LederPolicy", policy => policy.RequireRole("Leder"));
+    options.AddPolicy("LederMemberPolicy", policy => policy.RequireRole("Leder", "Member"));
+});
 
 var app = builder.Build();
 
