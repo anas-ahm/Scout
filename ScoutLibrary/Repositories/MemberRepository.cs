@@ -12,7 +12,7 @@ namespace ScoutLibrary.Repositories
         {
             _db = db;
         }
-
+        
         public Member Create(Member member)
         {
             try
@@ -85,6 +85,9 @@ namespace ScoutLibrary.Repositories
             return new Member { MemberId = id };
         }
 
+        // BADGE
+        // BADGE 
+        // BADGE
         public Member Update(Member member, int id)
         {
             try
@@ -106,6 +109,9 @@ namespace ScoutLibrary.Repositories
                 cmd.Parameters.AddWithValue("@member_id", id);
 
                 cmd.ExecuteNonQuery();
+                
+                member.MemberId = id;
+                AssignBadgeToMember(member);
             }
             
             // this catch, is if username is already taken.
@@ -124,6 +130,9 @@ namespace ScoutLibrary.Repositories
             return member;
         }
 
+        // BADGE
+        // BADGE 
+        // BADGE
         public Member? GetById(int id)
         {
             try
@@ -179,6 +188,9 @@ namespace ScoutLibrary.Repositories
             }
         }
 
+        // BADGE
+        // BADGE 
+        // BADGE
         public List<Member> GetAll()
         {
             try
@@ -213,6 +225,43 @@ namespace ScoutLibrary.Repositories
                 throw new Exception("Der opstod en fejl ved hentningen af spejdere ", ex);
             }
             
+        }
+        
+        // Private helper method to assign badges to members
+        private void AssignBadgeToMember(Member item)
+        {
+            List<Badge> allBadges = item.Badges;
+            
+            try
+            {
+                using MySqlConnection conn = _db.Connect();
+                using MySqlTransaction transaction = conn.BeginTransaction();
+
+                // 1. Remove the member's old badges
+                string deleteSql = "DELETE FROM member_badges WHERE member_id = @member_id";
+                using MySqlCommand deleteCmd = new MySqlCommand(deleteSql, conn, transaction);
+                
+                deleteCmd.Parameters.AddWithValue("@member_id", item.MemberId);
+                deleteCmd.ExecuteNonQuery();
+                
+
+                // 2. Insert the current badges
+                string insertSql = "INSERT INTO member_badges (member_id, badge_id) VALUES (@member_id, @badge_id)";
+                foreach (Badge badge in allBadges)
+                {
+                    using MySqlCommand insertCmd = new MySqlCommand(insertSql, conn, transaction);
+                    insertCmd.Parameters.AddWithValue("@member_id", item.MemberId);
+                    insertCmd.Parameters.AddWithValue("@badge_id", badge.BadgeId);
+                    insertCmd.ExecuteNonQuery();
+                }
+
+                // 3. Save everything (if anything above failed, nothing is changed)
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Couldn't assign badges to member in db", ex);
+            }
         }
 
         public void AssignActivityToMember(int memberID, int activityId)

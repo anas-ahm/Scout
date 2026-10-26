@@ -220,7 +220,7 @@
 
                                     @if (isLeader)
                                     {
-                                        <a class="btn btn--outline btn--sm" asp-page="/Leder/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
+                                        <a class="btn btn--outline btn--sm" asp-page="/Public/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
 
                                         <button type="button" class="btn btn--danger-outline btn--sm" command="show-modal" commandfor="delete-member-dialog-@member.MemberId">Slet</button>
 
