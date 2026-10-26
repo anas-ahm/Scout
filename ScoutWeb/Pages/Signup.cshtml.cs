@@ -21,8 +21,13 @@ namespace ScoutWeb.Pages
         [BindProperty] 
         public InputModel Input { get; set; } = new();
         
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Index");
+            }
+            return Page();
         }
 
         public IActionResult OnPost()
