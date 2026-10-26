@@ -32,7 +32,7 @@ namespace ScoutWeb.Pages.crud
             if (memberToUpdate == null)
             {
                 TempData["ErrorMessage"] = "Spejderen blev ikke fundet!";
-                return RedirectToPage("/crud/MemberDetails");
+                return RedirectToPage("/Public/MemberDetails");
             }
             
             ScoutInput = new ScoutInputModel
@@ -78,7 +78,7 @@ namespace ScoutWeb.Pages.crud
 
             TempData["SuccessMessage"] = $"{LeaderInput.FirstName} {LeaderInput.LastName} blev opdateret";
             
-            return Redirect($"/crud/MemberDetails/{id}");
+            return Redirect($"/Public/MemberDetails/{id}");
         }
 
         public IActionResult OnPostScoutUpdateMember(int id, [Bind(Prefix = nameof(ScoutInput))] ScoutInputModel input)
@@ -125,7 +125,7 @@ namespace ScoutWeb.Pages.crud
 
             TempData["SuccessMessage"] = $"{memberToUpdate.FirstName} {memberToUpdate.LastName} blev opdateret";
             
-            return Redirect($"/crud/MemberDetails/{id}");
+            return Redirect($"/Public/MemberDetails/{id}");
             
         }
 
