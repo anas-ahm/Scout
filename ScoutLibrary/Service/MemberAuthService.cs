@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using ScoutLibrary.Models;
 using ScoutLibrary.Repositories;
@@ -51,5 +53,45 @@ public class MemberAuthService : IMemberAuthService
 		member.HashPassword = _passwordHasher.HashPassword(member, member.HashPassword);
 
 		return _memberRepository.Create(member);
+	}
+
+	public ClaimsPrincipal LoginUser(Member member)
+	{
+		// Create claims for the logged-in user, meaning the information we want to store in the cookie
+		List<Claim> claims = new List<Claim>
+		{
+			new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
+
+			new Claim(ClaimTypes.Name, member.Username),
+
+			new Claim(ClaimTypes.Role, member.IsLeader ? "Leader" : "Member")
+		};
+
+		// Create a ClaimsIdentity with the claims and the authentication scheme, which represents the user's identity
+		ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+		// Create a ClaimsPrincipal with the identity, which represents the logged-in user
+		ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+		return principal;
+	}
+
+	public ClaimsPrincipal RegisterUser(Member member)
+	{
+		// Create claims for the registered user, meaning the information we want to store in the cookie
+		List<Claim> claims = new List<Claim>
+		{
+			new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
+
+			new Claim(ClaimTypes.Name, member.Username),
+
+			new Claim(ClaimTypes.Role, member.IsLeader ? "Leader" : "Member")
+		};
+
+		// Create a ClaimsIdentity with the claims and the authentication scheme, which represents the user's identity
+		ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+		// Create a ClaimsPrincipal with the identity, which represents the registered user
+		ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+		return principal;
 	}
 }
