@@ -63,6 +63,16 @@
         <h2 class="panel__title" id="activities-title">Aktiviteter</h2>
 
         <form class="search" method="get" role="search" asp-fragment="aktivitetsTabel">
+            @if (Model.LoggedInMember != null)
+            {
+                <a asp-page="./Index"
+                   asp-route-ShowOnlyAssigned="@(!Model.ShowOnlyAssigned)"
+                   asp-route-SearchQuery="@Model.SearchQuery"
+                   asp-fragment="aktivitetsTabel"
+                   class="btn btn--sm @(Model.ShowOnlyAssigned ? "btn--accent" : "btn--outline")">
+                    @(Model.ShowOnlyAssigned ? "✓ viser tilmeldte" : "Vis tilmeldte")
+                </a>
+            }
             <label class="visually-hidden" asp-for="SearchQuery">Søg i aktiviteter</label>
             <input asp-for="SearchQuery" placeholder="navn, spejdertegn, minimumsalder ..." />
             <button type="submit">Søg</button>
@@ -169,78 +179,79 @@
 
 
 <!-- Members -->
-@if (isLeader)
+@if (User.IsInRole("Leader"))
 {
     <div class="toolbar">
         <a class="btn btn--accent" asp-page="/Leder/CreateMember">Opret spejder</a>
     </div>
-}
 
-<section id="medlemstabellen" class="card panel" aria-labelledby="members-title">
-    <div class="panel__header">
-        <h2 class="panel__title" id="members-title">Medlemmer</h2>
 
-        <form class="search" method="get" role="search" asp-fragment="medlemstabellen">
-            <label class="visually-hidden" asp-for="SearchMember">Søg i medlemmer</label>
-            <input asp-for="SearchMember" placeholder="navn, spejdertegn, alder ..." />
-            <button type="submit">Søg</button>
-        </form>
-    </div>
+    <section id="medlemstabellen" class="card panel" aria-labelledby="members-title">
+        <div class="panel__header">
+            <h2 class="panel__title" id="members-title">Medlemmer</h2>
 
-    @if (!Model.memberList.Any())
-    {
-        <p class="empty-state">Ingen medlemmer fundet.</p>
-    }
-    else
-    {
-        <div class="table-wrap">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Navn</th>
-                        <th scope="col">Fødselsdato</th>
-                        <th scope="col">Telefon</th>
-                        <th scope="col">Brugernavn</th>
-                        <th scope="col">Rolle</th>
-                        <th scope="col">Handling</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (Member member in Model.memberList)
-                    {
-                        <tr>
-                            <td>@member.FirstName @member.LastName</td>
-                            <td>@member.DateOfBirth.ToString("dd-MM-yyyy")</td>
-                            <td>@member.PhoneNumber</td>
-                            <td>@member.Username</td>
-                            <td><span class="tag @(member.IsLeader ? "tag--leader" : "")">@(member.IsLeader ? "Leder" : "Spejder")</span></td>
-                            <td>
-                                <div class="actions">
-                                    <a class="btn btn--outline btn--sm" asp-page="/Public/MemberDetails" asp-route-id="@member.MemberId">Se detaljer</a>
-
-                                    @if (isLeader)
-                                    {
-                                        <a class="btn btn--outline btn--sm" asp-page="/Public/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
-
-                                        <button type="button" class="btn btn--danger-outline btn--sm" command="show-modal" commandfor="delete-member-dialog-@member.MemberId">Slet</button>
-
-                                        <dialog id="delete-member-dialog-@member.MemberId" aria-labelledby="delete-member-title-@member.MemberId">
-                                            <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId">
-                                                <p id="delete-member-title-@member.MemberId">Er du sikker på, at du vil slette <strong>@member.FirstName @member.LastName</strong>?</p>
-
-                                                <div class="dialog__actions">
-                                                    <button type="button" class="btn btn--outline" command="close" commandfor="delete-member-dialog-@member.MemberId">Fortryd</button>
-                                                    <button type="submit" class="btn btn--danger">Slet</button>
-                                                </div>
-                                            </form>
-                                        </dialog>
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <form class="search" method="get" role="search" asp-fragment="medlemstabellen">
+                <label class="visually-hidden" asp-for="SearchMember">Søg i medlemmer</label>
+                <input asp-for="SearchMember" placeholder="navn, spejdertegn, alder ..." />
+                <button type="submit">Søg</button>
+            </form>
         </div>
-    }
-</section>
+
+        @if (!Model.memberList.Any())
+        {
+            <p class="empty-state">Ingen medlemmer fundet.</p>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Navn</th>
+                            <th scope="col">Fødselsdato</th>
+                            <th scope="col">Telefon</th>
+                            <th scope="col">Brugernavn</th>
+                            <th scope="col">Rolle</th>
+                            <th scope="col">Handling</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Member member in Model.memberList)
+                        {
+                            <tr>
+                                <td>@member.FirstName @member.LastName</td>
+                                <td>@member.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                                <td>@member.PhoneNumber</td>
+                                <td>@member.Username</td>
+                                <td><span class="tag @(member.IsLeader ? "tag--leader" : "")">@(member.IsLeader ? "Leder" : "Spejder")</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <a class="btn btn--outline btn--sm" asp-page="/Public/MemberDetails" asp-route-id="@member.MemberId">Se detaljer</a>
+
+                                        @if (isLeader)
+                                        {
+                                            <a class="btn btn--outline btn--sm" asp-page="/Public/UpdateMember" asp-route-id="@member.MemberId">Rediger</a>
+
+                                            <button type="button" class="btn btn--danger-outline btn--sm" command="show-modal" commandfor="delete-member-dialog-@member.MemberId">Slet</button>
+
+                                            <dialog id="delete-member-dialog-@member.MemberId" aria-labelledby="delete-member-title-@member.MemberId">
+                                                <form method="post" asp-page-handler="ConfirmMemberDeletion" asp-route-id="@member.MemberId">
+                                                    <p id="delete-member-title-@member.MemberId">Er du sikker på, at du vil slette <strong>@member.FirstName @member.LastName</strong>?</p>
+
+                                                    <div class="dialog__actions">
+                                                        <button type="button" class="btn btn--outline" command="close" commandfor="delete-member-dialog-@member.MemberId">Fortryd</button>
+                                                        <button type="submit" class="btn btn--danger">Slet</button>
+                                                    </div>
+                                                </form>
+                                            </dialog>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+}

@@ -68,5 +68,32 @@
   max-width: 34rem;
 }
 
+/* --- Checkbox filter inside search bar --- */
+.search__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.65rem 0.85rem;
+    background: #fff;   
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+    .search__filter:hover {
+        border-color: var(--bark-500);
+    }
+
+    .search__filter input[type="checkbox"] {
+        width: 1.15rem;
+        height: 1.15rem;
+        accent-color: var(--color-primary);
+        cursor: pointer;
+        margin: 0;
+    }
+
 /* Keep date and time on one line in the activity table */
 #aktivitetsTabel td:nth-child(-n + 2) { white-space: nowrap; }

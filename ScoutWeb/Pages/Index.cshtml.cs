@@ -34,6 +34,8 @@ public class IndexModel : PageModel
     public string? SearchQuery { get; set; }
     [BindProperty(SupportsGet = true)]
     public string? SearchMember { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public bool ShowOnlyAssigned { get; set; }
 
     public IndexModel(ScoutService scoutService, ActivityService activityService, ICRUD<Member> memberRepository, ILogger<IndexModel> logger)
     {
@@ -52,6 +54,11 @@ public class IndexModel : PageModel
         try
         {
             List<Activity> allActivities = _activityService.GetAll();
+            if (ShowOnlyAssigned && LoggedInMember != null)
+            {
+                allActivities = allActivities.Where(a => AssignedActivityIds.Contains(a.ActivityId)).ToList();
+            }
+            
 
             if (string.IsNullOrWhiteSpace(SearchQuery))
             {
@@ -96,7 +103,6 @@ public class IndexModel : PageModel
         }
     }
     
-    // OnPost for cofirmation of deletion
     public IActionResult OnPostConfirmMemberDeletion(int id)
     {
         try
@@ -146,9 +152,6 @@ public class IndexModel : PageModel
     }
 
    
-    
-    
-    // OnPost for signing up for an activity
     public IActionResult OnPostAssignActivity(int activityId)
     {
         try
@@ -187,8 +190,7 @@ public class IndexModel : PageModel
         return RedirectToPage();
     }
     
-    
-    // OnPost for Unassigning up for an activity
+
     public IActionResult OnPostUnAssignActivity(int activityId)
     {
         try
@@ -210,7 +212,7 @@ public class IndexModel : PageModel
         TempData["SuccessMessage"] = "Du er nu afmeldt!";
         return RedirectToPage();
     }
-
+   
     // Loads the logged-in member and the assigned activity id's - 
     private void LoadLoggedInMember()
     {
@@ -227,5 +229,6 @@ public class IndexModel : PageModel
             AssignedActivityIds = LoggedInMember.Activities.Select(x => x.ActivityId).ToList();        
         }
     }
+    
     
 }
