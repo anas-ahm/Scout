@@ -37,6 +37,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Lax; // Restricts the cookie to same-site requests
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set the expiration time for the cookie
         options.SlidingExpiration = true; // Increases the expiration time if the user is still active
+
+        // Prevent ?ReturnUrl=%2F from being added to the URL
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.Redirect("/log-ind");
+            return Task.CompletedTask;
+        };
     });
 
 builder.Services.AddAuthorization(options=>         //laver autorisatonspolitikker, der bruges til at styre hvem der kan tilgå hvilke mapper/sider
