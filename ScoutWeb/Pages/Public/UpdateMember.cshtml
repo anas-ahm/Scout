@@ -11,7 +11,7 @@
     <div class="form-page">
         <h1 class="form-page__title">Rediger oplysninger</h1>
 
-        @if (Model.memberToUpdate.IsLeader)
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Leader"))
         {
             <form method="post" class="form" asp-page-handler="LeaderUpdateMember">
 
@@ -46,6 +46,23 @@
                     <label asp-for="LeaderInput.Username">Brugernavn</label>
                     <input asp-for="LeaderInput.Username" value="@Model.memberToUpdate.Username" />
                     <span asp-validation-for="LeaderInput.Username" class="text-danger"></span>
+                </div>
+                
+                <div class="form__field form__field--full">
+                    <label>Badges</label>
+                    <div class="form__checklist">
+                        @foreach (var badge in Model.allBadges)
+                        {
+                            <div class="form__check">
+                                <input type="checkbox"
+                                       id="badge_@badge.BadgeId"
+                                       name="LeaderInput.SelectedBadgeIds"
+                                       value="@badge.BadgeId"
+                                       checked="@Model.memberToUpdate.Badges.Any(b => b.BadgeId == badge.BadgeId)" />
+                                <label for="badge_@badge.BadgeId">@badge.Name</label>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 <div class="form__check">
