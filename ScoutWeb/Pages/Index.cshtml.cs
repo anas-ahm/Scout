@@ -53,31 +53,7 @@ public class IndexModel : PageModel
 
         try
         {
-            List<Activity> allActivities = _activityService.GetAll();
-            if (ShowOnlyAssigned && LoggedInMember != null)
-            {
-                allActivities = allActivities.Where(a => AssignedActivityIds.Contains(a.ActivityId)).ToList();
-            }
-            
-
-            if (string.IsNullOrWhiteSpace(SearchQuery))
-            {
-                AllActivities = allActivities;
-            }
-            else
-            {
-                // Check om søgeordet er et tal (søgning efter alder)
-                bool isNumeric = int.TryParse(SearchQuery, out int searchedAge);
-
-                AllActivities = allActivities.Where(a =>
-                    
-                    (a.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) //filtrerer efter navn
-                    ||                   
-                    (isNumeric && a.MinAge.HasValue && a.MinAge.Value == searchedAge) //filterer efter alder (kun hvis det er et tal)
-                    ||
-                    (a.RequiredBadges != null && a.RequiredBadges.Any(b => b.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))) // Filtrerer efter tilknyttede badges
-                ).ToList();
-            }
+            AllActivities = _activityService.filter(SearchQuery, AssignedActivityIds, ShowOnlyAssigned, LoggedInMember);
 
             List<Member> allMembers = _scoutService.ReadAllMembers();
 
