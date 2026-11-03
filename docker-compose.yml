@@ -1,0 +1,18 @@
+services:
+
+  scout:
+    image: vlysiumdev/scout:latest
+    container_name: scout_web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - CONNECTION_STRING=${CONNECTION_STRING}
+    networks:
+      - nginx
+    restart: unless-stopped
+    mem_limit: 96m
+
+# use reverse proxy container on cloud server
+networks:
+  nginx:
+    external: true
